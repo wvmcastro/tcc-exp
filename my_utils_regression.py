@@ -1,4 +1,4 @@
-from typing import List, Iterable
+from typing import List, Iterable, Tuple
 import torch
 import numpy as np
 from my_utils import print_and_log
@@ -11,12 +11,13 @@ def get_next_chkpt(checkpoints_list: List[int]) -> int:
 def train(model, 
           optimizer: torch.optim.Optimizer, 
           loss: torch.nn.modules.loss._Loss, 
-          data: torch.utils.data.DataLoader, 
+          train_data: torch.utils.data.DataLoader, 
+          test_data: torch.utils.data.DataLoader,
           epochs: int = 10,
           cuda: bool = True,
           logfile = None,
           checkpoints: List[int] = None,
-          checkpoints_folder: str = "") -> List[float]:
+          checkpoints_folder: str = "") -> Tuple[List[float], List[float]]:
     model = model.cuda() if cuda == True else model
     
     if checkpoints is not None:
@@ -25,7 +26,8 @@ def train(model,
     chkpt = next(chkpts)
     chkpt_counter = 0
 
-    lloss = []
+    train_losses = []
+    test_losses = []
     for epoch in range(1, epochs+1):
         if epoch != 1:
             print_and_log(("",), logfile)
@@ -34,7 +36,7 @@ def train(model,
 
         model.train()
         loss_sum = 0
-        for i, (x,y) in enumerate(data):
+        for i, (x,y) in enumerate(train_data):
             if cuda == True:
                 x, y = x.cuda(), y.cuda()
               
@@ -49,7 +51,10 @@ def train(model,
             print_and_log((f"Batch #{i}\tLoss: {l}",), logfile)
         
         avg_loss = loss_sum / (i+1)
-        lloss.append(avg_loss)
+        train_losses.append(avg_loss)
+
+        _, test_loss = eval(model, test_data, loss, cuda)
+        test_losses.append(test_loss)
         
         print_and_log((f"Avg Training Loss: {avg_loss}",), logfile)
 
@@ -59,7 +64,7 @@ def train(model,
             if chkpt_counter < len(checkpoints):
                 chkpt = next(chkpts)
     
-    return lloss
+    return train_losses, test_losses
 
 
 def save_model(model: BaseConvNet, epoch:int, folder: str) -> None:

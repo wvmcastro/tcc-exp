@@ -88,10 +88,11 @@ if __name__ == "__main__":
         chkpt_folder = f"{folder}fold{k}/"
         make_dir(chkpt_folder)
 
-        training_loss = train(model, opt,  nn.MSELoss(), dltrain, args.epochs, 
-                              cuda=True, logfile=mylogfile,
-                              checkpoints=[1,2,3,4],
-                              checkpoints_folder=chkpt_folder)
+        training_loss, test_loss = train(model, opt,  nn.MSELoss(), dltrain, dltest, 
+                                         args.epochs, 
+                                         cuda=True, logfile=mylogfile,
+                                         checkpoints=[1, 2, 3, 4],
+                                         checkpoints_folder=chkpt_folder)
 
         predictions, loss = eval(model, dltest, nn.MSELoss())
         folds_losses.append(loss)
@@ -100,10 +101,17 @@ if __name__ == "__main__":
 
         save_predictions(test_indexes, predictions, csv)
         
-        x = np.linspace(0, len(training_loss), len(training_loss))
-        plt.figure()
-        plt.plot(x, training_loss)
-        plt.savefig(folder+f"fold{k}-training-loss.png")
+        x = np.linspace(1, len(training_loss), len(training_loss))
+        fig, axs = plt.subplots(2)
+        
+        axs[0].set_title("Training Loss")
+        axs[0].plot(x, training_loss, c='c')
+
+        axs[1].set_title("Test Loss")
+        axs[1].plot(x, test_loss, c='m')
+        
+        plt.tight_layout()
+        plt.savefig(folder+f"fold{k}-training-test-loss.png")
 
         losses[f"fold#{k}"] = training_loss
 
