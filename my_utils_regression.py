@@ -53,7 +53,7 @@ def train(model,
         avg_loss = loss_sum / (i+1)
         train_losses.append(avg_loss)
 
-        _, test_loss = eval(model, test_data, loss, cuda)
+        _, test_loss = evaluate(model, test_data, loss, cuda)
         test_losses.append(test_loss)
         
         print_and_log((f"Avg Training Loss: {avg_loss}",), logfile)
@@ -76,7 +76,7 @@ def save_model(model: BaseConvNet, epoch:int, folder: str) -> None:
                 "state_dict": model.state_dict()}, 
                 filename)
 
-def eval(model, 
+def evaluate(model, 
          data: torch.utils.data.DataLoader,
          loss: torch.nn.modules.loss._Loss, 
          cuda: bool = True):

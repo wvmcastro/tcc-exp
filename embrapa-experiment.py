@@ -4,13 +4,13 @@ import numpy as np
 import pickle as pk
 
 from torchvision.models.alexnet import alexnet
-from torchvision.models.resnet import resnet18
 import torch
 import torch.nn as nn
 
 from my_utils import get_folds, print_and_log, make_dir
-from my_utils_regression import train, eval
+from my_utils_regression import train, evaluate
 from Alexnet import AlexNet
+from resnets import ResNet18
 from datasets import EmbrapaP2Dataset
 
 def get_alexNet(full_tunning: bool = False):
@@ -34,24 +34,36 @@ def get_alexNet(full_tunning: bool = False):
 
     return net
 
+def get_resnet18(full_tunning: bool = False):
+    # net = resnet18(pretrained=True)
+    # net.fc = nn.Linear(512, 1)
+    net = ResNet18(1)
+
+    regressor = nn.Sequential(
+        nn.Flatten(),
+        nn.Linear(12*7*512, 1000),
+        nn.Linear(1000, 1))
+    
+    net._classifier = regressor
+    return net
+
 def save_predictions(indexes, predictions_list, csvfile) -> None:
     for predictions in predictions_list:
         pred = [p.item() for p in predictions]
         for index, pred in zip(indexes, predictions):
             csvfile.write(f"{index+1}, {pred.item()}\n")
 
-def get_resnet(full_tunning: bool = False):
-    net = resnet18(pretrained=True)
-    net.fc = nn.Linear(512, 1)
-    return net
-
 if __name__ == "__main__":    
     parser = ArgumentParser()
+    parser.add_argument("model", type=str, 
+                        help="suported models: alexnet or resnet18")
     parser.add_argument("dataset_folder", type=str)
     parser.add_argument("--experiment_folder", type=str, default="")
     parser.add_argument("--epochs", type=int, default=1)
 
     args = parser.parse_args()
+
+    get_model = get_alexNet if args.model == alexnet else get_resnet18
 
     folder = args.experiment_folder
 
@@ -77,11 +89,11 @@ if __name__ == "__main__":
         test_indexes = folds[k]
 
         dltrain = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, train_indexes, augment=True), 
-                                                shuffle=True, batch_size=128)
+                                                shuffle=True, batch_size=64)
         dltest = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, test_indexes), 
-                                                batch_size=128)
+                                                batch_size=64)
 
-        model = get_alexNet(full_tunning=True)
+        model = get_model(full_tunning=True)
 
         opt = torch.optim.Adam(model.parameters())
 
@@ -94,7 +106,7 @@ if __name__ == "__main__":
                                          checkpoints=[1, 2, 3, 4],
                                          checkpoints_folder=chkpt_folder)
 
-        predictions, loss = eval(model, dltest, nn.MSELoss())
+        predictions, loss = evaluate(model, dltest, nn.MSELoss())
         folds_losses.append(loss)
 
         print_and_log((f"Test Loss: {loss}", "\n"), mylogfile)
