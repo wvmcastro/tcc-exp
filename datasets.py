@@ -3,6 +3,7 @@ from torch.utils import data
 from torchvision import transforms
 import numpy as np
 import os
+import PIL
 from PIL import Image
 import json
 from collections import OrderedDict
@@ -67,7 +68,9 @@ class DeepPhenoDataset(data.Dataset):
         return x, y
 
 class EmbrapaP2Dataset(data.Dataset):
-    def __init__(self, dataset_folder: str, indexes = None):
+    def __init__(self, dataset_folder: str, 
+                       indexes = None, 
+                       augment: bool = False):
         self._folder = dataset_folder
         self._list_IDS = []
         
@@ -77,6 +80,8 @@ class EmbrapaP2Dataset(data.Dataset):
         self._ymin = 0
         self._ymax = 0
         
+        self._augment = augment
+
         self._transform = None
         self._load_dataset(dataset_folder, indexes)
     
@@ -114,14 +119,25 @@ class EmbrapaP2Dataset(data.Dataset):
         self._transform = t
 
     def __len__(self):
-        return len(self._list_IDS)
+        if self._augment == True:
+            return 2 * len(self._list_IDS)
+        else:
+            return len(self._list_IDS)
 
     def __getitem__(self, index) -> tuple:
-        ID = self._list_IDS[index]
-        x = Image.open(self._folder + ID)
-        x = self._transform(x)
+        if self._augment:
+            true_index = index // 2
+            ID = self._list_IDS[true_index]
+            x = Image.open(self._folder + ID)
+            x = x.transpose(PIL.Image.ROTATE_180)
+            y = self._ys[true_index]
+        else:
+            ID = self._list_IDS[index]
+            x = Image.open(self._folder + ID)
+            y = self._ys[index]
 
-        y = self._ys[index]
+        x = self._transform(x)
+        
 
         return x, np.float32(y)
 

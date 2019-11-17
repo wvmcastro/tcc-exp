@@ -76,7 +76,7 @@ if __name__ == "__main__":
                 train_indexes += folds[n]
         test_indexes = folds[k]
 
-        dltrain = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, train_indexes), 
+        dltrain = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, train_indexes, augment=True), 
                                                 shuffle=True, batch_size=128)
         dltest = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, test_indexes), 
                                                 batch_size=128)
