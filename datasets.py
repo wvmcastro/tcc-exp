@@ -3,7 +3,6 @@ from torch.utils import data
 from torchvision import transforms
 import numpy as np
 import os
-import PIL
 from PIL import Image
 import json
 from collections import OrderedDict
@@ -108,13 +107,13 @@ class EmbrapaP2Dataset(data.Dataset):
                 self._list_IDS.append(ID)
                 self._ys.append(y)
         
-        xstats = annotations["statistics"]["x"]
-        normalize = transforms.Normalize(mean=xstats["mean"], std=xstats["std"])
+        # xstats = annotations["statistics"]["x"]
+        # normalize = transforms.Normalize(mean=xstats["mean"], std=xstats["std"])
 
         t = transforms.Compose([
             transforms.Resize(227),
             transforms.ToTensor(),
-            normalize])
+            """normalize"""])
         
         self._transform = t
 
@@ -127,10 +126,11 @@ class EmbrapaP2Dataset(data.Dataset):
     def __getitem__(self, index) -> tuple:
         if self._augment:
             true_index = index // 2
+            y = self._ys[true_index]
+
             ID = self._list_IDS[true_index]
             x = Image.open(self._folder + ID)
-            x = x.transpose(PIL.Image.ROTATE_180)
-            y = self._ys[true_index]
+            x = x.transpose(Image.FLIP_LEFT_RIGHT)
         else:
             ID = self._list_IDS[index]
             x = Image.open(self._folder + ID)

@@ -60,6 +60,7 @@ if __name__ == "__main__":
     parser.add_argument("dataset_folder", type=str)
     parser.add_argument("--experiment_folder", type=str, default="")
     parser.add_argument("--epochs", type=int, default=1)
+    parser.add_argument("--lr", type=float, default=0.001)
 
     args = parser.parse_args()
 
@@ -95,7 +96,7 @@ if __name__ == "__main__":
 
         model = get_model(full_tunning=True)
 
-        opt = torch.optim.Adam(model.parameters())
+        opt = torch.optim.Adam(model.parameters(), lr=args.lr)
 
         chkpt_folder = f"{folder}fold{k}/"
         make_dir(chkpt_folder)
