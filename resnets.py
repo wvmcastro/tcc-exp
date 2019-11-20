@@ -49,8 +49,7 @@ class ResNet18(BaseConvNet):
         )
 
         self._classifier = nn.Sequential(
-            nn.Linear(512, 1000),
-            nn.Linear(1000, nClasses)
+            nn.Linear(512, nClasses),
         )
 
     # def forward(self, x):

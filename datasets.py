@@ -107,13 +107,13 @@ class EmbrapaP2Dataset(data.Dataset):
                 self._list_IDS.append(ID)
                 self._ys.append(y)
         
-        # xstats = annotations["statistics"]["x"]
-        # normalize = transforms.Normalize(mean=xstats["mean"], std=xstats["std"])
+        xstats = annotations["statistics"]["x"]
+        normalize = transforms.Normalize(mean=xstats["mean"], std=xstats["std"])
 
         t = transforms.Compose([
             transforms.Resize(227),
             transforms.ToTensor(),
-            """normalize"""])
+            normalize])
         
         self._transform = t
 
@@ -130,7 +130,8 @@ class EmbrapaP2Dataset(data.Dataset):
 
             ID = self._list_IDS[true_index]
             x = Image.open(self._folder + ID)
-            x = x.transpose(Image.FLIP_LEFT_RIGHT)
+            if index % 2 == 1:
+                x = x.transpose(Image.FLIP_LEFT_RIGHT)
         else:
             ID = self._list_IDS[index]
             x = Image.open(self._folder + ID)

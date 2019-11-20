@@ -14,6 +14,7 @@ def train(model,
           train_data: torch.utils.data.DataLoader, 
           test_data: torch.utils.data.DataLoader,
           epochs: int = 10,
+          lr_schedular: torch.optim.lr_scheduler._LRScheduler = None,
           cuda: bool = True,
           logfile = None,
           checkpoints: List[int] = None,
@@ -39,13 +40,16 @@ def train(model,
         for i, (x,y) in enumerate(train_data):
             if cuda == True:
                 x, y = x.cuda(), y.cuda()
-              
+                
             pred = model(x)
             l = loss(pred.view(-1), y)
             l.backward()
 
             optimizer.step()
             optimizer.zero_grad()
+
+            if lr_schedular is not None:
+                lr_schedular.step()
 
             loss_sum += l.item()
             print_and_log((f"Batch #{i}\tLoss: {l}",), logfile)

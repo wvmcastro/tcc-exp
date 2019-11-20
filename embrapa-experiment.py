@@ -4,6 +4,7 @@ import numpy as np
 import pickle as pk
 
 from torchvision.models.alexnet import alexnet
+from torchvision.models.resnet import resnet18
 import torch
 import torch.nn as nn
 
@@ -35,16 +36,16 @@ def get_alexNet(full_tunning: bool = False):
     return net
 
 def get_resnet18(full_tunning: bool = False):
-    # net = resnet18(pretrained=True)
-    # net.fc = nn.Linear(512, 1)
-    net = ResNet18(1)
+    net = resnet18(pretrained=False)
+    net.fc = nn.Linear(512, 1)
+    # net = ResNet18(1)
 
-    regressor = nn.Sequential(
-        nn.Flatten(),
-        nn.Linear(12*7*512, 1000),
-        nn.Linear(1000, 1))
+    # regressor = nn.Sequential(
+    #     nn.Flatten(),
+    #     nn.Linear(12*7*512, 1000),
+    #     nn.Linear(1000, 1))
     
-    net._classifier = regressor
+    # net._classifier = regressor
     return net
 
 def save_predictions(indexes, predictions_list, csvfile) -> None:
@@ -64,7 +65,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    get_model = get_alexNet if args.model == alexnet else get_resnet18
+    get_model = get_alexNet if args.model == "alexnet" else get_resnet18
 
     folder = args.experiment_folder
 
@@ -90,21 +91,26 @@ if __name__ == "__main__":
         test_indexes = folds[k]
 
         dltrain = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, train_indexes, augment=True), 
-                                                shuffle=True, batch_size=64)
+                                                shuffle=True, batch_size=128)
         dltest = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, test_indexes), 
-                                                batch_size=64)
+                                                batch_size=128)
 
         model = get_model(full_tunning=True)
 
         opt = torch.optim.Adam(model.parameters(), lr=args.lr)
+        # opt = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
+        schedular = torch.optim.lr_scheduler.CyclicLR(opt, base_lr=args.lr/6, max_lr=args.lr, 
+                                                           step_size_down=100,
+                                                           step_size_up=100,
+                                                           cycle_momentum=False)
 
         chkpt_folder = f"{folder}fold{k}/"
         make_dir(chkpt_folder)
 
         training_loss, test_loss = train(model, opt,  nn.MSELoss(), dltrain, dltest, 
-                                         args.epochs, 
+                                         args.epochs, lr_schedular=None,
                                          cuda=True, logfile=mylogfile,
-                                         checkpoints=[1, 2, 3, 4],
+                                         checkpoints=[100, 200, 300, 400],
                                          checkpoints_folder=chkpt_folder)
 
         predictions, loss = evaluate(model, dltest, nn.MSELoss())
@@ -131,7 +137,7 @@ if __name__ == "__main__":
     csv.close()
 
     plt.figure()
-    x = np.linspace(0, len(folds_losses), len(folds_losses))
+    x = np.linspace(1, len(folds_losses), len(folds_losses))
     plt.plot(x, folds_losses)
     plt.savefig(folder+"folds-losses.png")
 
