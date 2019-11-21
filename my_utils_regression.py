@@ -33,7 +33,10 @@ def train(model,
         if epoch != 1:
             print_and_log(("",), logfile)
 
-        print_and_log((f"Epoch #{epoch}:", "-" * 15), logfile)
+        if lr_schedular is None:
+            print_and_log((f"Epoch #{epoch}:", "-" * 15), logfile)
+        else:
+            print_and_log((f"Epoch #{epoch}:\t lr: {lr_schedular.get_lr()}", "-" * 15), logfile)
 
         model.train()
         loss_sum = 0
