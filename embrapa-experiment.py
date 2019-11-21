@@ -91,12 +91,12 @@ if __name__ == "__main__":
         test_indexes = folds[k]
 
         dltrain = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, train_indexes, augment=True), 
-                                                shuffle=True, batch_size=128)
+                                                shuffle=True, batch_size=64)
         dltest = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, test_indexes), 
-                                                batch_size=128)
+                                                batch_size=64)
 
         model = get_model(full_tunning=True)
-
+        
         opt = torch.optim.Adam(model.parameters(), lr=args.lr)
         # opt = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
         schedular = torch.optim.lr_scheduler.CyclicLR(opt, base_lr=args.lr/6, max_lr=args.lr, 
@@ -108,7 +108,7 @@ if __name__ == "__main__":
         make_dir(chkpt_folder)
 
         training_loss, test_loss = train(model, opt,  nn.MSELoss(), dltrain, dltest, 
-                                         args.epochs, lr_schedular=None,
+                                         args.epochs, lr_schedular=schedular,
                                          cuda=True, logfile=mylogfile,
                                          checkpoints=[100, 200, 300, 400],
                                          checkpoints_folder=chkpt_folder)
