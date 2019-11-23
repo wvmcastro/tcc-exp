@@ -46,6 +46,7 @@ def get_resnet18(full_tunning: bool = False):
     #     nn.Linear(1000, 1))
     
     # net._classifier = regressor
+    net.name = "ResNet18"
     return net
 
 def save_predictions(indexes, predictions_list, csvfile) -> None:
