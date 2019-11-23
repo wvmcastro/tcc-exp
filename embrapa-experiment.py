@@ -99,16 +99,16 @@ if __name__ == "__main__":
         
         opt = torch.optim.Adam(model.parameters(), lr=args.lr)
         # opt = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
-        schedular = torch.optim.lr_scheduler.CyclicLR(opt, base_lr=args.lr/6, max_lr=args.lr, 
-                                                           step_size_down=100,
-                                                           step_size_up=100,
-                                                           cycle_momentum=False)
+        # schedular = torch.optim.lr_scheduler.CyclicLR(opt, base_lr=args.lr/6, max_lr=args.lr, 
+        #                                                    step_size_down=100,
+        #                                                    step_size_up=100,
+        #                                                    cycle_momentum=False)
 
         chkpt_folder = f"{folder}fold{k}/"
         make_dir(chkpt_folder)
 
         training_loss, test_loss = train(model, opt,  nn.MSELoss(), dltrain, dltest, 
-                                         args.epochs, lr_schedular=schedular,
+                                         args.epochs, lr_schedular=None,
                                          cuda=True, logfile=mylogfile,
                                          checkpoints=[100, 200, 300, 400],
                                          checkpoints_folder=chkpt_folder)
@@ -126,7 +126,7 @@ if __name__ == "__main__":
         axs[0].set_title("Training Loss")
         axs[0].plot(x, training_loss, c='c')
 
-        axs[1].set_title("Test Loss")
+        axs[1].set_title("Validation Loss")
         axs[1].plot(x, test_loss, c='m')
         
         plt.tight_layout()
