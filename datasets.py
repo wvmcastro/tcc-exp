@@ -119,19 +119,21 @@ class EmbrapaP2Dataset(data.Dataset):
 
     def __len__(self):
         if self._augment == True:
-            return 2 * len(self._list_IDS)
+            return 3 * len(self._list_IDS)
         else:
             return len(self._list_IDS)
 
     def __getitem__(self, index) -> tuple:
         if self._augment:
-            true_index = index // 2
+            true_index = index // 3
             y = self._ys[true_index]
 
             ID = self._list_IDS[true_index]
             x = Image.open(self._folder + ID)
-            if index % 2 == 1:
+            if index % 3 == 1:
                 x = x.transpose(Image.FLIP_LEFT_RIGHT)
+            elif index % 3 == 2:
+                x = x.transpose(Image.FLIP_TOP_BOTTOM)
         else:
             ID = self._list_IDS[index]
             x = Image.open(self._folder + ID)
