@@ -51,10 +51,3 @@ class ResNet18(BaseConvNet):
         self._classifier = nn.Sequential(
             nn.Linear(512, nClasses),
         )
-
-    # def forward(self, x):
-    #     print(x.shape)
-    #     x = self._features(x)
-    #     print(x.shape)
-    #     x = self._classifier(x)
-    #     return x

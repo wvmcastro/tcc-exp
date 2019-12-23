@@ -12,5 +12,7 @@ class BaseConvNet(nn.Module):
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self._features(x)
+        print(x.shape)
         x = self._classifier(x)
+        
         return x

@@ -10,11 +10,13 @@ import torch.nn as nn
 
 from my_utils import get_folds, print_and_log, make_dir
 from my_utils_regression import train, evaluate
+
 from Alexnet import AlexNet
 from resnets import ResNet18
+from Mobilenet import MobileNetV2
 from datasets import EmbrapaP2Dataset
 
-def get_alexNet(full_tunning: bool = False):
+def get_alexNet():
     # net = alexnet(pretrained=True)
 
     # if not full_tunning:
@@ -35,7 +37,7 @@ def get_alexNet(full_tunning: bool = False):
 
     return net
 
-def get_resnet18(full_tunning: bool = False):
+def get_resnet18():
     net = resnet18(pretrained=False)
     net.fc = nn.Linear(512, 1)
     # net = ResNet18(1)
@@ -47,6 +49,10 @@ def get_resnet18(full_tunning: bool = False):
     
     # net._classifier = regressor
     net.name = "ResNet18"
+    return net
+
+def get_mobilenetv2():
+    net = MobileNetV2()
     return net
 
 def save_predictions(indexes, predictions_list, csvfile) -> None:
@@ -66,7 +72,13 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    get_model = get_alexNet if args.model == "alexnet" else get_resnet18
+    get_model = None
+    if args.model == "alexnet":
+        get_model = get_alexNet
+    elif args.model == "resnet":
+        get_model = get_resnet18
+    elif args.model == "mobilenet":
+        get_model = get_mobilenetv2
 
     folder = args.experiment_folder
 
@@ -92,11 +104,11 @@ if __name__ == "__main__":
         test_indexes = folds[k]
 
         dltrain = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, train_indexes, augment=True), 
-                                                shuffle=True, batch_size=128)
+                                                shuffle=True, batch_size=32)
         dltest = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, test_indexes), 
-                                                batch_size=128)
+                                                batch_size=32)
 
-        model = get_model(full_tunning=True)
+        model = get_model()
         
         opt = torch.optim.Adam(model.parameters(), lr=args.lr)
         # opt = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
