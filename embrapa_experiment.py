@@ -40,15 +40,17 @@ def get_alexNet():
 def get_resnet18():
     net = resnet18(pretrained=False)
     net.fc = nn.Linear(512, 1)
-    # net = ResNet18(1)
-
-    # regressor = nn.Sequential(
-    #     nn.Flatten(),
-    #     nn.Linear(12*7*512, 1000),
-    #     nn.Linear(1000, 1))
-    
-    # net._classifier = regressor
     net.name = "ResNet18"
+    return net
+
+def get_my_resnet():
+    net = ResNet18(1)
+    regressor = nn.Sequential(
+        nn.Flatten(),
+        nn.Linear(12*7*512, 1000),
+        nn.Linear(1000, 1))
+    
+    net._classifier = regressor
     return net
 
 def get_mobilenetv2():
@@ -77,6 +79,8 @@ if __name__ == "__main__":
         get_model = get_alexNet
     elif args.model == "resnet":
         get_model = get_resnet18
+    elif args.model == "myresnet":
+        get_model = get_my_resnet
     elif args.model == "mobilenet":
         get_model = get_mobilenetv2
 
@@ -104,9 +108,9 @@ if __name__ == "__main__":
         test_indexes = folds[k]
 
         dltrain = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, train_indexes, augment=True), 
-                                                shuffle=True, batch_size=32)
+                                                shuffle=True, batch_size=64)
         dltest = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, test_indexes), 
-                                                batch_size=32)
+                                                batch_size=64)
 
         model = get_model()
         
