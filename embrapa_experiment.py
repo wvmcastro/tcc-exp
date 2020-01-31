@@ -16,13 +16,22 @@ from resnets import ResNet18
 from Mobilenet import MobileNetV2
 from datasets import EmbrapaP2Dataset
 
+def get_imagent_alexNet():
+    net = alexnet(pretrained=True)
+    
+    regressor = nn.Sequential(
+        nn.Flatten(),
+        nn.Linear(10*6*256, 4096, bias=True),
+        nn.ReLU(inplace=True),
+        nn.Linear(4096, 4096, bias=True),
+        nn.ReLU(inplace=True),
+        nn.Linear(4096, 1, bias=True))
+    net.classifier = regressor
+
+    net.name = "ImagenetAlexNet"
+    return net
+
 def get_alexNet():
-    # net = alexnet(pretrained=True)
-
-    # if not full_tunning:
-    #     for params in net.features.parameters():
-    #         params.requires_grad = False
-
     net = AlexNet(1)
     
     regressor = nn.Sequential(
@@ -77,6 +86,8 @@ if __name__ == "__main__":
     get_model = None
     if args.model == "alexnet":
         get_model = get_alexNet
+    if args.model == "imagenetalexnet":
+        get_model = get_alexNet
     elif args.model == "resnet":
         get_model = get_resnet18
     elif args.model == "myresnet":
@@ -86,11 +97,8 @@ if __name__ == "__main__":
 
     folder = args.experiment_folder
 
-    dataset = EmbrapaP2Dataset(args.dataset_folder)
-    n = len(dataset)
-    # ntrain = int(0.8*n)
-    # ntest = n - ntrain
-    # dstrain, dstest = torch.utils.data.random_split(dataset, (ntrain, ntest))
+    n = len(EmbrapaP2Dataset(args.dataset_folder))
+
     csv = open(folder+"predctions.csv", "w+")
 
     folds = get_folds(n, 10)
@@ -115,11 +123,6 @@ if __name__ == "__main__":
         model = get_model()
         
         opt = torch.optim.Adam(model.parameters(), lr=args.lr)
-        # opt = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
-        # schedular = torch.optim.lr_scheduler.CyclicLR(opt, base_lr=args.lr/6, max_lr=args.lr, 
-        #                                                    step_size_down=100,
-        #                                                    step_size_up=100,
-        #                                                    cycle_momentum=False)
 
         chkpt_folder = f"{folder}fold{k}/"
         make_dir(chkpt_folder)
