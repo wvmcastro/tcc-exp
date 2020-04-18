@@ -75,10 +75,11 @@ def save_predictions(indexes, predictions_list, csvfile) -> None:
 if __name__ == "__main__":    
     parser = ArgumentParser()
     parser.add_argument("model", type=str, 
-                        help="suported models: alexnet or resnet18")
+                        help="supported models: alexnet or resnet18")
     parser.add_argument("dataset_folder", type=str)
     parser.add_argument("--experiment_folder", type=str, default="")
     parser.add_argument("--epochs", type=int, default=1)
+    parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--lr", type=float, default=0.001)
 
     args = parser.parse_args()
@@ -99,7 +100,7 @@ if __name__ == "__main__":
 
     n = len(EmbrapaP2Dataset(args.dataset_folder))
 
-    csv = open(folder+"predctions.csv", "w+")
+    csv = open(folder+"predictions.csv", "w+")
 
     folds = get_folds(n, 10)
     folds_losses = []
@@ -116,9 +117,9 @@ if __name__ == "__main__":
         test_indexes = folds[k]
 
         dltrain = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, train_indexes, augment=True), 
-                                                shuffle=True, batch_size=128)
+                                                shuffle=True, batch_size=args.batch_size)
         dltest = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, test_indexes), 
-                                                batch_size=128)
+                                                batch_size=args.batch_size)
 
         model = get_model()
         
@@ -127,6 +128,7 @@ if __name__ == "__main__":
         chkpt_folder = f"{folder}fold{k}/"
         make_dir(chkpt_folder)
 
+        # TODO: make checkpoints a parsed argument
         training_loss, test_loss = train(model, opt,  nn.MSELoss(), dltrain, dltest, 
                                          args.epochs, lr_schedular=None,
                                          cuda=True, logfile=mylogfile,
