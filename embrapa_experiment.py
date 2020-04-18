@@ -89,6 +89,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", type=int, default=1)
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--lr", type=float, default=0.001)
+    parser.add_argument("--augment", type=str, default="", help="options: no, yes, super")
 
     args = parser.parse_args()
 
@@ -126,7 +127,7 @@ if __name__ == "__main__":
                 train_indexes += folds[n]
         test_indexes = folds[k]
 
-        dltrain = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, train_indexes, augment=True), 
+        dltrain = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, train_indexes, augment=args.augment), 
                                                 shuffle=True, batch_size=args.batch_size)
         dltest = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, test_indexes), 
                                                 batch_size=args.batch_size)

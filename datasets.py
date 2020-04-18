@@ -69,7 +69,7 @@ class DeepPhenoDataset(data.Dataset):
 class EmbrapaP2Dataset(data.Dataset):
     def __init__(self, dataset_folder: str, 
                        indexes = None, 
-                       augment: bool = False):
+                       augment: str = "no"):
         self._folder = dataset_folder
         self._list_IDS = []
         
@@ -118,24 +118,34 @@ class EmbrapaP2Dataset(data.Dataset):
         self._transform = t
 
     def __len__(self):
-        if self._augment == True:
+        if self._augment == "super":
             return 3 * len(self._list_IDS)
+        elif self._augment == "yes":
+            return 2 * len(self._list_IDS)
         else:
             return len(self._list_IDS)
 
     def __getitem__(self, index) -> tuple:
-        if self._augment:
+        if self._augment == "super":
             true_index = index // 3
             y = self._ys[true_index]
 
             ID = self._list_IDS[true_index]
             x = Image.open(self._folder + ID)
-	    # TODO: currently, this is code for super augmented, to make a augmented __getitem__ erase the elif on line 137 and replace 3 == 1 for 2 == 1 on line 135
-	    # TODO: make augmented/super augmented a parameter
+	
             if index % 3 == 1:
                 x = x.transpose(Image.FLIP_LEFT_RIGHT)
             elif index % 3 == 2:
                 x = x.transpose(Image.FLIP_TOP_BOTTOM)
+        elif self._augment == "yes":
+            true_index = index // 2
+            y = self._ys[true_index]
+
+            ID = self._list_IDS[true_index]
+            x = Image.open(self._folder + ID)
+
+            if index % 2 == 1:
+                x = x.transpose(Image.FLIP_LEFT_RIGHT)
         else:
             ID = self._list_IDS[index]
             x = Image.open(self._folder + ID)
