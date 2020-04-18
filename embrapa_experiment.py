@@ -83,7 +83,7 @@ def save_predictions(indexes, predictions_list, csvfile) -> None:
 def create_checkpoints_list(epochs_between_checkpoints, epochs):
     checkpoints_list = []
     epochs_executed = epochs_between_checkpoints
-    while (epochs_executed < epochs):
+    while (epochs_executed <= epochs):
         checkpoints_list.append(epochs_executed)
         epochs_executed += epochs_between_checkpoints
     return checkpoints_list
