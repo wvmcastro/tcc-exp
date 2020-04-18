@@ -46,6 +46,14 @@ def get_alexNet():
 
     return net
 
+def get_myalexnet_pretrained():
+    net = get_alexNet()
+    imagenet_alexnet = get_imagent_alexNet()
+    net._features = imagenet_alexnet.features
+    net.name = "MyAlexNetPretrained"
+
+    return net
+
 def get_resnet18():
     net = resnet18(pretrained=False)
     net.fc = nn.Linear(512, 1)
@@ -95,6 +103,8 @@ if __name__ == "__main__":
         get_model = get_my_resnet
     elif args.model == "mobilenet":
         get_model = get_mobilenetv2
+    elif args.model == "myalexnetpretrained":
+        get_model = get_myalexnet_pretrained
 
     folder = args.experiment_folder
 
