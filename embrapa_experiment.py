@@ -80,6 +80,14 @@ def save_predictions(indexes, predictions_list, csvfile) -> None:
         for index, pred in zip(indexes, predictions):
             csvfile.write(f"{index+1}, {pred.item()}\n")
 
+def create_checkpoints_list(epochs_between_checkpoints, epochs):
+    checkpoints_list = []
+    epochs_executed = epochs_between_checkpoints
+    while (epochs_executed < epochs):
+        checkpoints_list.append(epochs_executed)
+        epochs_executed += epochs_between_checkpoints
+    return checkpoints_list
+
 if __name__ == "__main__":    
     parser = ArgumentParser()
     parser.add_argument("model", type=str, 
@@ -90,6 +98,7 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--lr", type=float, default=0.001)
     parser.add_argument("--augment", type=str, default="", help="options: no, yes, super")
+    parser.add_argument("--epochs_between_checkpoints", type=int, default=100)
 
     args = parser.parse_args()
 
@@ -139,11 +148,12 @@ if __name__ == "__main__":
         chkpt_folder = f"{folder}fold{k}/"
         make_dir(chkpt_folder)
 
-        # TODO: make checkpoints a parsed argument
+        checkpoints_list = create_checkpoints_list(args.epochs_between_checkpoints, args.epochs)
+
         training_loss, test_loss = train(model, opt,  nn.MSELoss(), dltrain, dltest, 
                                          args.epochs, lr_schedular=None,
                                          cuda=True, logfile=mylogfile,
-                                         checkpoints=[10, 30, 40, 50],
+                                         checkpoints=checkpoints_list,
                                          checkpoints_folder=chkpt_folder)
 
         predictions, loss = evaluate(model, dltest, nn.MSELoss())
