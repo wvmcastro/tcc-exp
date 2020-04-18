@@ -130,6 +130,8 @@ class EmbrapaP2Dataset(data.Dataset):
 
             ID = self._list_IDS[true_index]
             x = Image.open(self._folder + ID)
+	    # TODO: currently, this is code for super augmented, to make a augmented __getitem__ erase the elif on line 137 and replace 3 == 1 for 2 == 1 on line 135
+	    # TODO: make augmented/super augmented a parameter
             if index % 3 == 1:
                 x = x.transpose(Image.FLIP_LEFT_RIGHT)
             elif index % 3 == 2:

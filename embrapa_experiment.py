@@ -116,9 +116,9 @@ if __name__ == "__main__":
         test_indexes = folds[k]
 
         dltrain = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, train_indexes, augment=True), 
-                                                shuffle=True, batch_size=64)
+                                                shuffle=True, batch_size=128)
         dltest = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, test_indexes), 
-                                                batch_size=64)
+                                                batch_size=128)
 
         model = get_model()
         
@@ -130,7 +130,7 @@ if __name__ == "__main__":
         training_loss, test_loss = train(model, opt,  nn.MSELoss(), dltrain, dltest, 
                                          args.epochs, lr_schedular=None,
                                          cuda=True, logfile=mylogfile,
-                                         checkpoints=[1, 2, 3, 4],
+                                         checkpoints=[10, 30, 40, 50],
                                          checkpoints_folder=chkpt_folder)
 
         predictions, loss = evaluate(model, dltest, nn.MSELoss())
