@@ -70,6 +70,12 @@ def get_my_resnet():
     net._classifier = regressor
     return net
 
+def get_resnet18_pretrained():
+    net = resnet18(pretrained=True)
+    net.fc = nn.Linear(512, 1)
+    net.name = "ResNet18Pretrained"
+    return net
+
 def get_mobilenetv2():
     net = MobileNetV2()
     return net
@@ -97,7 +103,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", type=int, default=1)
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--lr", type=float, default=0.001)
-    parser.add_argument("--augment", type=str, default="", help="options: no, yes, super")
+    parser.add_argument("--augment", type=str, default="no", help="options: no, yes, super")
     parser.add_argument("--epochs_between_checkpoints", type=int, default=100)
 
     args = parser.parse_args()
@@ -115,6 +121,8 @@ if __name__ == "__main__":
         get_model = get_mobilenetv2
     elif args.model == "myalexnetpretrained":
         get_model = get_myalexnet_pretrained
+    elif args.model == "resnet18pretrained":
+        get_model = get_resnet18_pretrained
 
     folder = args.experiment_folder
 
