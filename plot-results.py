@@ -154,10 +154,10 @@ if __name__ == "__main__":
             
             metrics[experiment_name] = get_metrics(real, pred)
 
-            # plot_and_save_histogram(experiment_file, 
-            #                         real, pred, 
-            #                         args.bins, w)
-            # scatter_plot_and_save(experiment_file, real, pred)
+            plot_and_save_histogram(experiment_file, 
+                                    real, pred, 
+                                    args.bins, w)
+            scatter_plot_and_save(experiment_file, real, pred)
     
     for key, values in metrics.items():
         print(key)
