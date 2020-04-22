@@ -72,6 +72,7 @@ def get_my_resnet():
 
 def get_resnet18_pretrained():
     net = resnet18(pretrained=True)
+    net.fc = nn.Linear(512, 1)
     net.name = "ResNet18Pretrained"
     return net
 
