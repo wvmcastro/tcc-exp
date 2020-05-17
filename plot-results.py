@@ -6,6 +6,15 @@ import matplotlib.patches as mpatches
 import numpy as np
 from my_utils import make_dir
 
+experiment_model = {
+    6: "AlexNet",
+    7: "AlexNet",
+    8: "AlexNet",
+    9: "ResNet18",
+    10: "ResNet18",
+    11: "ResNet18"
+}
+
 def make_parse() -> ArgumentParser:
     parser = ArgumentParser()
     parser.add_argument("srcdir", type=str)
@@ -117,20 +126,23 @@ def plot_rroc_space(metrics: dict, dstdir):
     p = np.linspace(0, 1.8*l, 100)
     plt.plot(p, -p, dashes=dashes, color="#cccccc")
 
-    colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')
+    colors = {"AlexNet": 'c', "ResNet18":'r'}
+
     plt.xlim((0, 1.1*l))
     plt.ylim((-1.1*l, 0))
     plt.xlabel("OVER")
     plt.ylabel("UNDER")
-    
+
     for i, p in enumerate(zip(x,y)):
-        plt.plot(p[0], p[1], colors[i]+'x')
+        index = int(names[i].strip('#'))
+        model = experiment_model[index]
+        plt.plot(p[0], p[1], colors[model]+'x')
     
     for i, name in enumerate(names):
-        plt.text(x[i]+4, y[i]+4, name, color=colors[i], fontsize=9)
+        model = experiment_model[int(name.strip("#"))]
+        plt.text(x[i]+4, y[i]+4, name, color=colors[model], fontsize=9)
 
     plt.savefig(f"{dstdir}rroc.pdf")
-
 
 
 if __name__ == "__main__":
