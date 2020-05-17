@@ -137,7 +137,7 @@ def plot_rroc_space(metrics: dict, dstdir):
     for i, p in enumerate(zip(x,y)):
         index = int(names[i].strip('#'))
         model = experiment_model[index]
-        plt.plot(p[0], p[1], colors[model]+'x', label=names[i] + " " + model, markersize='15.0')
+        plt.plot(p[0], p[1], colors[model]+'x', label=names[i] + " " + model, markersize='12.0', markeredgewidth=2.0)
     
     for i, name in enumerate(names):
         model = experiment_model[int(name.strip("#"))]
