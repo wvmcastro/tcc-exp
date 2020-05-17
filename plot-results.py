@@ -6,6 +6,13 @@ import matplotlib.patches as mpatches
 import numpy as np
 from my_utils import make_dir
 
+# gambiara p/ plots que o taka pediu
+experiment_model = {1: "AlexNet",
+                    2: "ResNet18*",
+                    3: "AlexNet",
+                    4: "ResNet18",
+                    5: "AlexNet"}
+
 def make_parse() -> ArgumentParser:
     parser = ArgumentParser()
     parser.add_argument("srcdir", type=str)
@@ -131,6 +138,77 @@ def plot_rroc_space(metrics: dict, dstdir):
 
     plt.savefig(f"{dstdir}rroc.pdf")
 
+def plot_rroc_space_prime(metrics: dict, dstdir):
+    # meto criado a partir do acima para os plots
+    # do taka
+    x = []
+    y = []
+    names = []
+    for e, m in metrics.items():
+        x.append(m["over"] / 330) 
+        y.append(m["under"] / 330) 
+        names.append(f"#{e[-1]}")
+    
+    l = max(np.max(x), abs(np.min(y)))
+
+    fig, ax = plt.subplots()
+    # plt.figure()
+    plt.title("RROC SPACE")
+
+    x_size_caio = 5195.2887
+    
+    # under + over = 0
+    dashes = [5, 5, 5, 5]
+    p = np.linspace(0, 1.8*x_size_caio, 100)
+    plt.plot(p, -p, dashes=dashes, color="#cccccc")
+
+    # colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')
+    colors = {"AlexNet": 'c', "ResNet18": 'r'}
+    
+    plt.xlim((0, x_size_caio))
+    plt.ylim((-x_size_caio, 0))
+    plt.xlabel("OVER")
+    plt.ylabel("UNDER")
+
+    def get_model(i: int) -> str:
+        if experiment_model[i] == "AlexNet":
+            return "AlexNet"
+        else:
+            return "ResNet18"
+    
+    for i, p in enumerate(zip(x,y)):
+        index = int(names[i].strip('#'))
+        model = get_model(index)
+        plt.plot(p[0], p[1], colors[model]+'x', 
+        label=names[i] + " " + experiment_model[index])
+    
+    for i, name in enumerate(names):
+        model = get_model(int(name.strip("#")))
+        plt.text(x[i]+4, y[i]+4, name, color=colors[model], fontsize=9)
+
+    plt.legend(loc='upper right', shadow=False)
+
+    #zoom
+    axins = ax.inset_axes([0.14, 0.14, 0.35, 0.35])
+    for i, p in enumerate(zip(x,y)):
+        index = int(names[i].strip('#'))
+        model = get_model(index)
+        axins.plot(p[0], p[1], colors[model]+'x', 
+        label=names[i] + " " + experiment_model[index])
+    
+    for i, name in enumerate(names):
+        model = get_model(int(name.strip("#")))
+        axins.text(x[i]+4, y[i]+4, name, color=colors[model], fontsize=9)
+    
+    x1, x2, y1, y2 = 300, 600, -600, -300
+    axins.set_xlim(x1, x2)
+    axins.set_ylim(y1, y2)
+
+    # axins.set_xticklabels('')
+    # axins.set_yticklabels('')
+    ax.indicate_inset_zoom(axins)
+    
+    plt.savefig(f"{dstdir}rroc.pdf")
 
 
 if __name__ == "__main__":
@@ -154,10 +232,10 @@ if __name__ == "__main__":
             
             metrics[experiment_name] = get_metrics(real, pred)
 
-            plot_and_save_histogram(experiment_file, 
-                                    real, pred, 
-                                    args.bins, w)
-            scatter_plot_and_save(experiment_file, real, pred)
+            # plot_and_save_histogram(experiment_file, 
+            #                         real, pred, 
+            #                         args.bins, w)
+            # scatter_plot_and_save(experiment_file, real, pred)
     
     for key, values in metrics.items():
         print(key)
@@ -165,5 +243,6 @@ if __name__ == "__main__":
         print("-"*15)
         print()
     
-    plot_rroc_space(metrics, args.dstdir)
+    # plot_rroc_space(metrics, args.dstdir)
+    plot_rroc_space_prime(metrics, args.dstdir)
 
