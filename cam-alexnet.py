@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import cv2
 
 from embrapa_experiment import get_alexNet
+from embrapa_experiment import get_myalexnet_pretrained
 from BaseCNN import BaseConvNet
 
 class CamAlexNet(nn.Module):
@@ -98,7 +99,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    alexnet = get_alexNet()
+    # alexnet = get_alexNet()
+    alexnet = get_myalexnet_pretrained()
     load_model(alexnet, args.pth_file)
     cam_net = CamAlexNet(alexnet).cuda()
     cam_net.eval()
