@@ -138,9 +138,7 @@ def plot_rroc_space(metrics: dict, dstdir):
 
     plt.savefig(f"{dstdir}rroc.pdf")
 
-def plot_rroc_space_prime(metrics: dict, dstdir):
-    # meto criado a partir do acima para os plots
-    # do taka
+def plot_rroc_space_zoom(metrics: dict, dstdir):
     x = []
     y = []
     names = []
@@ -244,5 +242,5 @@ if __name__ == "__main__":
         print()
     
     # plot_rroc_space(metrics, args.dstdir)
-    plot_rroc_space_prime(metrics, args.dstdir)
+    plot_rroc_space_zoom(metrics, args.dstdir)
 
