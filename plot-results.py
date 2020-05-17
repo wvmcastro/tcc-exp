@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches   
 import numpy as np
+from natsort import natsorted, ns
 from my_utils import make_dir
 
 experiment_model = {
@@ -136,11 +137,13 @@ def plot_rroc_space(metrics: dict, dstdir):
     for i, p in enumerate(zip(x,y)):
         index = int(names[i].strip('#'))
         model = experiment_model[index]
-        plt.plot(p[0], p[1], colors[model]+'x')
+        plt.plot(p[0], p[1], colors[model]+'x', label=names[i] + " " + model, markersize='15.0')
     
     for i, name in enumerate(names):
         model = experiment_model[int(name.strip("#"))]
         plt.text(x[i]+4, y[i]+4, name, color=colors[model], fontsize=9)
+
+    plt.legend(loc='upper right', shadow=False)
 
     plt.savefig(f"{dstdir}rroc.pdf")
 
@@ -155,6 +158,7 @@ if __name__ == "__main__":
     w = None
     for root, _, files in os.walk(args.srcdir):
 
+        files = natsorted(files, alg=ns.IGNORECASE)
         for f in files:
             real, pred = read_csv(root+f, args.delimiter)
 
