@@ -106,12 +106,12 @@ def plot_rroc_space(metrics: dict, dstdir):
     for e, m in metrics.items():
         x.append(m["over"]/330)
         y.append(m["under"]/330)
-        names.append(f"#{e[-1]}")
+        names.append(f"#{e.strip('experiment')}")
     
     l = max(np.max(x), abs(np.min(y)))
 
     plt.figure()
-    plt.title("ESPAÇO RROC")
+    plt.title("RROC SPACE")
     # under + over = 0
     dashes = [5, 5, 5, 5]
     p = np.linspace(0, 1.8*l, 100)
@@ -120,8 +120,8 @@ def plot_rroc_space(metrics: dict, dstdir):
     colors = ('b', 'g', 'r', 'c', 'm', 'y', 'k')
     plt.xlim((0, 1.1*l))
     plt.ylim((-1.1*l, 0))
-    plt.xlabel("SUPERIOR")
-    plt.ylabel("INFERIOR")
+    plt.xlabel("OVER")
+    plt.ylabel("UNDER")
     
     for i, p in enumerate(zip(x,y)):
         plt.plot(p[0], p[1], colors[i]+'x')
