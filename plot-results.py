@@ -178,7 +178,7 @@ def plot_rroc_space_zoom(metrics: dict, dstdir):
         index = int(names[i].strip('#'))
         model = get_model(index)
         plt.plot(p[0], p[1], colors[model]+'x', 
-        label=names[i] + " " + experiment_model[index])
+        label=names[i] + " " + experiment_model[index],markersize=12.0, markeredgewidth=2.0)
     
     for i, name in enumerate(names):
         model = get_model(int(name.strip("#")))
@@ -192,7 +192,7 @@ def plot_rroc_space_zoom(metrics: dict, dstdir):
         index = int(names[i].strip('#'))
         model = get_model(index)
         axins.plot(p[0], p[1], colors[model]+'x', 
-        label=names[i] + " " + experiment_model[index])
+        label=names[i] + " " + experiment_model[index], markersize=12.0, markeredgewidth=2.0)
     
     for i, name in enumerate(names):
         model = get_model(int(name.strip("#")))
@@ -219,7 +219,7 @@ if __name__ == "__main__":
     w = None
     for root, _, files in os.walk(args.srcdir):
 
-        for f in files:
+        for f in sorted(files):
             real, pred = read_csv(root+f, args.delimiter)
 
             if w is None:
