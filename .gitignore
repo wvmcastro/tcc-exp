@@ -4,3 +4,4 @@ misc/
 *.png
 *.txt
 !spec-file.txt
+!conda-env.txt
