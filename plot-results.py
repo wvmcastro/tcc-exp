@@ -85,6 +85,10 @@ def scatter_plot_and_save(experiment_name: str,
     plot_name = f"{experiment_name}-scatter.pdf"
     plt.savefig(plot_name, bbox_inches="tight")
 
+def mean_absolute_percentage_error(y_true, y_pred): 
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+
 def get_metrics(real: Tuple, pred: Tuple) -> Tuple:
     unders = []
     overs = []
@@ -102,9 +106,10 @@ def get_metrics(real: Tuple, pred: Tuple) -> Tuple:
     mean_error = (over + under) / n
     mean_abs_error = (over - under) / n
     mse = np.sum([e**2 for e in overs+unders])
+    mape = mean_absolute_percentage_error(real, pred)
 
     metrics = {"over": over, "under": under, "mean_error": mean_error,
-               "MAE": mean_abs_error, "MSE": mse}
+               "MAE": mean_abs_error, "MSE": mse, "MAPE": mape}
     
     return metrics
 
