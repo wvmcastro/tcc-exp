@@ -3,4 +3,5 @@ __pycache__
 misc/
 *.png
 *.txt
-!tcc-requirements.txt
+!spec-file.txt
+!conda-env.txt
