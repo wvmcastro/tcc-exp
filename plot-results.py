@@ -3,6 +3,7 @@ from typing import Tuple
 from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches   
+from scipy.stats import norm
 import numpy as np
 from my_utils import make_dir
 
@@ -46,17 +47,24 @@ def plot_and_save_histogram(experiment_name: str,
                             bins: int, 
                             weights=None) -> None:
     plt.figure()
-    n1, bins, _ = plt.hist(real, bins=args.bins,
-                                       weights=w, 
-                                       facecolor="#34a2eb",
-                                       edgecolor="#2c5aa3",
-                                       alpha=0.9)
     
-    n2, bins, _ = plt.hist(pred, bins=args.bins, 
-                                       weights=w,
-                                       facecolor="#ffbc47",
-                                    #    edgecolor="#9e742b", 
-                                       alpha=0.6)
+    range_min = min(np.min(real), np.min(pred))
+    range_max = max(np.max(real), np.max(pred))
+    full_range = (range_min, range_max)
+
+    n1, bins, _ = plt.hist(real, bins=bins,
+                                 range=full_range,
+                                 weights=weights, 
+                                 facecolor="#34a2eb",
+                                 edgecolor="#2c5aa3",
+                                 alpha=0.9)
+    
+    n2, bins, _ = plt.hist(pred, bins=bins, 
+                                 range=full_range,
+                                 weights=weights,
+                                 facecolor="#ffbc47",
+                              #    edgecolor="#9e742b", 
+                                 alpha=0.6)
     
     real_patch = mpatches.Patch(color='#34a2eb', label='y')
     pred_patch = mpatches.Patch(color='#ffbc47', label='ŷ')
@@ -66,6 +74,23 @@ def plot_and_save_histogram(experiment_name: str,
     plot_nane = f"{experiment_name}-hist-{intersection}.pdf"
     plt.savefig(plot_nane, bbox_inches="tight")
 
+def plot_and_save_data_histogram(data, num_of_bins):
+    plt.figure()
+    w = np.ones(len(data)) / len(data)
+    n, bins, _ = plt.hist(data, 
+                           bins=num_of_bins,
+                           weights=w,
+                           facecolor="#34a2eb",
+                           edgecolor="#2c5aa3",
+                           alpha=0.9)
+
+    mean = np.mean(data)
+    variance = np.var(data)
+    half_bin_size = (bins[1] - bins[0]) / 2
+    y = norm.pdf(bins, mean, np.sqrt(variance)) * half_bin_size * 2
+    plt.plot(bins, y, "--")
+    plt.show()
+    
 def scatter_plot_and_save(experiment_name: str,
                           real: Tuple,
                           pred: Tuple) -> None:
@@ -188,6 +213,15 @@ def plot_rroc_space_zoom(metrics: dict, dstdir):
 
     #zoom
     axins = ax.inset_axes([0.14, 0.14, 0.35, 0.35])
+    x1, x2, y1, y2 = 300, 600, -600, -300
+    axins.set_xlim(x1, x2)
+    axins.set_ylim(y1, y2)
+
+    # under + over = 0
+    dashes = [5, 5, 5, 5]
+    p = np.linspace(300, 600, 100)
+    axins.plot(p, -p, dashes=dashes, color="#cccccc")
+
     for i, p in enumerate(zip(x,y)):
         index = int(names[i].strip('#'))
         model = get_model(index)
@@ -198,16 +232,13 @@ def plot_rroc_space_zoom(metrics: dict, dstdir):
         model = get_model(int(name.strip("#")))
         axins.text(x[i]+4, y[i]+4, name, color=colors[model], fontsize=9)
     
-    x1, x2, y1, y2 = 300, 600, -600, -300
-    axins.set_xlim(x1, x2)
-    axins.set_ylim(y1, y2)
+    
 
     # axins.set_xticklabels('')
     # axins.set_yticklabels('')
     ax.indicate_inset_zoom(axins)
     
     plt.savefig(f"{dstdir}rroc.pdf")
-
 
 if __name__ == "__main__":
     parser = make_parse()
@@ -230,10 +261,13 @@ if __name__ == "__main__":
             
             metrics[experiment_name] = get_metrics(real, pred)
 
-            # plot_and_save_histogram(experiment_file, 
-            #                         real, pred, 
-            #                         args.bins, w)
+            plot_and_save_histogram(experiment_file, 
+                                    real, pred, 
+                                    args.bins, w)
+
             # scatter_plot_and_save(experiment_file, real, pred)
+        
+        # plot_and_save_data_histogram(real, args.bins)
     
     for key, values in metrics.items():
         print(key)
