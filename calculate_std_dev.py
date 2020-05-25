@@ -2,6 +2,7 @@ import os
 from argparse import ArgumentParser
 import numpy as np
 from typing import Tuple
+from scipy.stats import pearsonr
 from natsort import natsorted, ns
 
 NUMBER_OF_FOLDS = 10
@@ -44,6 +45,7 @@ def get_std_devs(real: Tuple, pred: Tuple) -> Tuple:
     all_mean_abs_errors = []
     all_mse = []
     all_mape = []
+    all_correlations = []
 
     real_divided_by_fold = split(real, NUMBER_OF_FOLDS)
     pred_divided_by_fold = split(pred, NUMBER_OF_FOLDS)
@@ -69,9 +71,11 @@ def get_std_devs(real: Tuple, pred: Tuple) -> Tuple:
         all_mse.append(mse)
         mape = mean_absolute_percentage_error(real_values_in_fold, pred_divided_by_fold[fold_index])
         all_mape.append(mape)
+        correlation = pearsonr(real_values_in_fold, pred_divided_by_fold[fold_index])
+        all_correlations.append(correlation)
 
     std_devs = {"mean_error": np.std(all_mean_errors),
-               "MAE": np.std(all_mean_abs_errors), "MSE": np.std(all_mse), "MAPE": np.std(all_mape)}
+               "MAE": np.std(all_mean_abs_errors), "MSE": np.std(all_mse), "MAPE": np.std(all_mape), "Pearson Correlation:": np.std(all_correlations)}
     
     return std_devs
 
