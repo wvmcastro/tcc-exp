@@ -75,7 +75,7 @@ def scatter_plot_and_save(experiment_name: str,
     
     plt.figure()
     plt.xlabel("REAL")
-    plt.ylabel("PREDITO")
+    plt.ylabel("PREDICTION")
 
     plt.plot(real, pred, 'co')
     

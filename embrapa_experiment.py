@@ -94,6 +94,21 @@ def create_checkpoints_list(epochs_between_checkpoints, epochs):
         epochs_executed += epochs_between_checkpoints
     return checkpoints_list
 
+def plot_average_validation_loss(losses, number_of_epochs, number_of_folds):
+    x = np.linspace(1, number_of_epochs, number_of_epochs)
+
+    average_validation_loss = np.zeros(number_of_epochs)
+    for fold in range(number_of_folds):
+        average_validation_loss += np.array(losses[f'fold#{fold}']["validation_loss"])
+
+    average_validation_loss /= number_of_epochs
+
+    plt.figure()
+    plt.plot(x, average_validation_loss)
+    plt.xlabel("Epochs")
+    plt.ylabel("Validation Loss")
+    plt.savefig(f"avg_validation_loss.pdf")
+
 if __name__ == "__main__":    
     parser = ArgumentParser()
     parser.add_argument("model", type=str, 
@@ -181,16 +196,18 @@ if __name__ == "__main__":
         axs[1].plot(x, test_loss, c='m')
         
         plt.tight_layout()
-        plt.savefig(folder+f"fold{k}-training-test-loss.png")
+        plt.savefig(folder+f"fold{k}-training-test-loss.pdf")
 
-        losses[f"fold#{k}"] = training_loss
+        losses[f"fold#{k}"] = {"training_loss": traning_loss, "validation_loss", test_loss}
+
+    plot_average_validation_loss(losses, number_of_epochs, number_of_folds)
 
     csv.close()
 
     plt.figure()
     x = np.linspace(1, len(folds_losses), len(folds_losses))
     plt.plot(x, folds_losses)
-    plt.savefig(folder+"folds-losses.png")
+    plt.savefig(folder+"folds-losses.pdf")
 
     losses["folds-losses"] = folds_losses
 
