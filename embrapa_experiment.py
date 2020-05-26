@@ -142,6 +142,8 @@ if __name__ == "__main__":
 
     folder = args.experiment_folder
 
+    make_dir(folder)
+
     n = len(EmbrapaP2Dataset(args.dataset_folder))
 
     csv = open(folder+"predictions.csv", "w+")
