@@ -94,7 +94,7 @@ def create_checkpoints_list(epochs_between_checkpoints, epochs):
         epochs_executed += epochs_between_checkpoints
     return checkpoints_list
 
-def plot_average_validation_loss(losses, number_of_epochs, number_of_folds):
+def plot_average_validation_loss(losses, number_of_epochs, number_of_folds, filename):
     x = np.linspace(1, number_of_epochs, number_of_epochs)
 
     average_validation_loss = np.zeros(number_of_epochs)
@@ -107,7 +107,7 @@ def plot_average_validation_loss(losses, number_of_epochs, number_of_folds):
     plt.plot(x, average_validation_loss)
     plt.xlabel("Epochs")
     plt.ylabel("Validation Loss")
-    plt.savefig(f"avg_validation_loss.pdf")
+    plt.savefig(filename)
 
 if __name__ == "__main__":    
     parser = ArgumentParser()
@@ -120,6 +120,7 @@ if __name__ == "__main__":
     parser.add_argument("--lr", type=float, default=0.001)
     parser.add_argument("--augment", type=str, default="no", help="options: no, yes, super")
     parser.add_argument("--epochs_between_checkpoints", type=int, default=100)
+    parser.add_argument("--cuda_device_number", type=int, default=0)
 
     args = parser.parse_args()
 
@@ -177,7 +178,8 @@ if __name__ == "__main__":
                                          args.epochs, lr_schedular=None,
                                          cuda=True, logfile=mylogfile,
                                          checkpoints=checkpoints_list,
-                                         checkpoints_folder=chkpt_folder)
+                                         checkpoints_folder=chkpt_folder,
+                                         cuda_device_number=args.cuda_device_number)
 
         predictions, loss = evaluate(model, dltest, nn.MSELoss())
         folds_losses.append(loss)
@@ -200,7 +202,7 @@ if __name__ == "__main__":
 
         losses[f"fold#{k}"] = {"training_loss": training_loss, "validation_loss": test_loss}
 
-    plot_average_validation_loss(losses, number_of_epochs, number_of_folds)
+    plot_average_validation_loss(losses, args.epochs, 10, folder+"avg_validation_loss.pdf")
 
     csv.close()
 

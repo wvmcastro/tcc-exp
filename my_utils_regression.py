@@ -18,8 +18,11 @@ def train(model,
           cuda: bool = True,
           logfile = None,
           checkpoints: List[int] = None,
-          checkpoints_folder: str = "") -> Tuple[List[float], List[float]]:
-    model = model.cuda() if cuda == True else model
+          checkpoints_folder: str = "",
+          cuda_device_number: int = 0) -> Tuple[List[float], List[float]]:
+    # model = model.cuda() if cuda == True else model
+    device = torch.device(f'cuda:{cuda_device_number}') if torch.cuda.is_available() else torch.device('cpu')
+    model.to(device)
     
     if checkpoints is not None:
         chkpts = get_next_chkpt(checkpoints)
