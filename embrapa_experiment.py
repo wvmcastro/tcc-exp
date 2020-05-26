@@ -124,7 +124,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    device = torch.device(f'cuda:{cuda_device_number}') if torch.cuda.is_available() else torch.device('cpu')
+    device = torch.device(f'cuda:{args.cuda_device_number}') if torch.cuda.is_available() else torch.device('cpu')
     torch.cuda.set_device(device)
 
     get_model = None
