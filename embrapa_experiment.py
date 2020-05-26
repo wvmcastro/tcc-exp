@@ -124,6 +124,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    device = torch.device(f'cuda:{cuda_device_number}') if torch.cuda.is_available() else torch.device('cpu')
+    torch.cuda.set_device(device)
+
     get_model = None
     if args.model == "alexnet":
         get_model = get_alexNet
@@ -180,8 +183,7 @@ if __name__ == "__main__":
                                          args.epochs, lr_schedular=None,
                                          cuda=True, logfile=mylogfile,
                                          checkpoints=checkpoints_list,
-                                         checkpoints_folder=chkpt_folder,
-                                         cuda_device_number=args.cuda_device_number)
+                                         checkpoints_folder=chkpt_folder)
 
         predictions, loss = evaluate(model, dltest, nn.MSELoss())
         folds_losses.append(loss)
