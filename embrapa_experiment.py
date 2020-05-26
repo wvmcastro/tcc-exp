@@ -198,7 +198,7 @@ if __name__ == "__main__":
         plt.tight_layout()
         plt.savefig(folder+f"fold{k}-training-test-loss.pdf")
 
-        losses[f"fold#{k}"] = {"training_loss": traning_loss, "validation_loss", test_loss}
+        losses[f"fold#{k}"] = {"training_loss": training_loss, "validation_loss": test_loss}
 
     plot_average_validation_loss(losses, number_of_epochs, number_of_folds)
 
