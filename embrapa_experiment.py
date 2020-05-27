@@ -101,7 +101,7 @@ def plot_average_validation_loss(losses, number_of_epochs, number_of_folds, file
     for fold in range(number_of_folds):
         average_validation_loss += np.array(losses[f'fold#{fold}']["validation_loss"])
 
-    average_validation_loss /= number_of_epochs
+    average_validation_loss /= number_of_folds
 
     plt.figure()
     plt.plot(x, average_validation_loss)

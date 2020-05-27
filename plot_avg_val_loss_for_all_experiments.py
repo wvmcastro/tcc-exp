@@ -44,7 +44,7 @@ if __name__ == '__main__':
                 for fold in range(NUMBER_OF_FOLDS):
                     avg_val_losses_by_experiment[experiment_name] += np.array(losses_object[f'fold#{fold}']["validation_loss"])
 
-                avg_val_losses_by_experiment[experiment_name] /= number_of_epochs
+                avg_val_losses_by_experiment[experiment_name] /= NUMBER_OF_FOLDS
                 plt.plot(x, avg_val_losses_by_experiment[experiment_name], label=f'#{EXPERIMENT_NUMBER_BY_NAME[experiment_name]}')
 
     plt.legend()
