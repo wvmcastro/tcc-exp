@@ -71,11 +71,11 @@ def get_std_devs(real: Tuple, pred: Tuple) -> Tuple:
         all_mse.append(mse)
         mape = mean_absolute_percentage_error(real_values_in_fold, pred_divided_by_fold[fold_index])
         all_mape.append(mape)
-        correlation = pearsonr(real_values_in_fold, pred_divided_by_fold[fold_index])
+        correlation = pearsonr(real_values_in_fold, pred_divided_by_fold[fold_index])[0]
         all_correlations.append(correlation)
 
     std_devs = {"mean_error": np.std(all_mean_errors),
-               "MAE": np.std(all_mean_abs_errors), "MSE": np.std(all_mse), "MAPE": np.std(all_mape), "Pearson Correlation:": np.std(all_correlations)}
+               "MAE": np.std(all_mean_abs_errors), "MSE": np.std(all_mse), "MAPE": np.std(all_mape), "Pearson Correlation": np.std(all_correlations)}
     
     return std_devs
 
@@ -95,9 +95,10 @@ if __name__ == "__main__":
             
             std_devs_by_metric[experiment_name] = get_std_devs(real, pred)
     
+    print('>>>>>>> Standard Deviations by metric <<<<<<<')
     for key, values in std_devs_by_metric.items():
-        print('>>>>>>> Standard Deviations by metric <<<<<<<')
-        print(key)
-        print(values)
-        print("-"*15)
+        # print(key)
+        # print(values)
+        print(f'{key.strip("experiment")} & {values["MAE"]} & {values["MSE"]} & {values["Pearson Correlation"]} & {values["MAPE"]}')
+        # print("-"*15)
         print()
