@@ -4,7 +4,9 @@ from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches   
 import numpy as np
+from scipy.stats import pearsonr
 from natsort import natsorted, ns
+
 from my_utils import make_dir
 
 experiment_model = {
@@ -114,9 +116,10 @@ def get_metrics(real: Tuple, pred: Tuple) -> Tuple:
     mean_abs_error = (over - under) / n
     mse = np.sum([e**2 for e in overs+unders])
     mape = mean_absolute_percentage_error(real, pred)
+    correlation = pearsonr(real, pred)
 
     metrics = {"over": over, "under": under, "mean_error": mean_error,
-               "MAE": mean_abs_error, "MSE": mse, "MAPE": mape}
+               "MAE": mean_abs_error, "MSE": mse, "MAPE": mape, "Pearson's Correlation": correlation}
     
     return metrics
 
