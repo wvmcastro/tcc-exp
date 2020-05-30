@@ -8,19 +8,19 @@ from natsort import natsorted, ns
 from my_utils import make_dir
 
 experiment_model = {
-    6: "AlexNet",
     7: "AlexNet",
     8: "AlexNet",
-    9: "ResNet18",
+    9: "AlexNet",
     10: "ResNet18",
-    11: "ResNet18"
+    11: "ResNet18",
+    12: "ResNet18"
 }
 
 def make_parse() -> ArgumentParser:
     parser = ArgumentParser()
     parser.add_argument("srcdir", type=str)
     parser.add_argument("dstdir", type=str)
-    parser.add_argument("--delimiter", type=str, default=';')
+    parser.add_argument("--delimiter", type=str, default=',')
     parser.add_argument("--bins", type=int, default=20)
     return parser
 
