@@ -23,6 +23,7 @@ EXPERIMENT_NUMBER_BY_NAME = {
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("exp_dir", type=str, help="directory with all experiment directories")
+    parser.add_argument("--limited_epochs", type=int, help="specify number of epochs to be plotted, if not specified, plots all epochs.")
     args = parser.parse_args()
 
     avg_val_losses_by_experiment = dict()
@@ -37,15 +38,25 @@ if __name__ == '__main__':
 
             with open(losses_file, "rb") as fp:
                 losses_object = pk.load(fp)
-                number_of_epochs = len(losses_object['fold#0'])
+                
+                if args.limited_epochs is not None:
+                    number_of_epochs = args.limited_epochs
+                else:
+                    number_of_epochs = len(losses_object['fold#0']["validation_loss"])
+                
                 x = np.linspace(1, number_of_epochs, number_of_epochs)
                 avg_val_losses_by_experiment[experiment_name] = np.zeros(number_of_epochs)
 
                 for fold in range(NUMBER_OF_FOLDS):
-                    avg_val_losses_by_experiment[experiment_name] += np.array(losses_object[f'fold#{fold}']["validation_loss"])
+                    avg_val_losses_by_experiment[experiment_name] += np.array(losses_object[f'fold#{fold}']["validation_loss"][:number_of_epochs])
 
                 avg_val_losses_by_experiment[experiment_name] /= NUMBER_OF_FOLDS
                 plt.plot(x, avg_val_losses_by_experiment[experiment_name], label=f'#{EXPERIMENT_NUMBER_BY_NAME[experiment_name]}')
 
-    plt.legend()
+    # ordering labels in legend by experiment number
+    handles, labels = plt.gca().get_legend_handles_labels()
+    order = [labels.index('#1'), labels.index('#2'), labels.index('#3'), labels.index('#4'), labels.index('#5'), labels.index('#6'),
+     labels.index('#7'), labels.index('#8'), labels.index('#9'), labels.index('#10'), labels.index('#11'), labels.index('#12')]
+    plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order])
+    
     plt.savefig('all-experiments-avg-val-loss.pdf')
