@@ -219,7 +219,7 @@ def plot_rroc_space_zoom(metrics: dict, dstdir):
 
     #zoom
     axins = ax.inset_axes([0.14, 0.14, 0.35, 0.35])
-    x1, x2, y1, y2 = 300, 600, -600, -300
+    x1, x2, y1, y2 = 350, 650, -600, -300
     axins.set_xlim(x1, x2)
     axins.set_ylim(y1, y2)
 
