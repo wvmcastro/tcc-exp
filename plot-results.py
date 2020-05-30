@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches   
 from scipy.stats import norm
 import numpy as np
+from scipy.stats import pearsonr
 from my_utils import make_dir
 
 # gambiara p/ plots que o taka pediu
@@ -130,9 +131,10 @@ def get_metrics(real: Tuple, pred: Tuple) -> Tuple:
     mean_abs_error = (over - under) / n
     mse = np.sum([e**2 for e in overs+unders])
     mape = mean_absolute_percentage_error(real, pred)
+    correlation = pearsonr(real, pred)
 
     metrics = {"over": over, "under": under, "mean_error": mean_error,
-               "MAE": mean_abs_error, "MSE": mse, "MAPE": mape}
+               "MAE": mean_abs_error, "MSE": mse, "MAPE": mape, "Pearson's Correlation": correlation}
     
     return metrics
 
@@ -267,13 +269,13 @@ if __name__ == "__main__":
             
             metrics[experiment_name] = get_metrics(real, pred)
 
-            plot_and_save_histogram(experiment_file, 
-                                    real, pred, 
-                                    args.bins, w)
+        #     plot_and_save_histogram(experiment_file, 
+        #                             real, pred, 
+        #                             args.bins, w)
 
-            scatter_plot_and_save(experiment_file, real, pred)
+        #     scatter_plot_and_save(experiment_file, real, pred)
         
-        plot_and_save_data_histogram(real, args.bins)
+        # plot_and_save_data_histogram(real, args.bins)
     
     for key, values in metrics.items():
         print(key)
@@ -282,5 +284,5 @@ if __name__ == "__main__":
         print()
     
     # plot_rroc_space(metrics, args.dstdir)
-    plot_rroc_space_zoom(metrics, args.dstdir)
+    # plot_rroc_space_zoom(metrics, args.dstdir)
 
