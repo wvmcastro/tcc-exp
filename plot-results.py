@@ -90,7 +90,7 @@ def plot_and_save_data_histogram(data, num_of_bins):
     half_bin_size = (bins[1] - bins[0]) / 2
     y = norm.pdf(bins, mean, np.sqrt(variance)) * half_bin_size * 2
     plt.plot(bins, y, "--")
-    plt.show()
+    # plt.show()
     
 def scatter_plot_and_save(experiment_name: str,
                           real: Tuple,
