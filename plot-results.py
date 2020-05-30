@@ -9,16 +9,17 @@ from my_utils import make_dir
 
 # gambiara p/ plots que o taka pediu
 experiment_model = {1: "AlexNet",
-                    2: "ResNet18*",
+                    2: "AlexNet",
                     3: "AlexNet",
                     4: "ResNet18",
-                    5: "AlexNet"}
+                    5: "ResNet18",
+                    6: "ResNet18",}
 
 def make_parse() -> ArgumentParser:
     parser = ArgumentParser()
     parser.add_argument("srcdir", type=str)
     parser.add_argument("dstdir", type=str)
-    parser.add_argument("--delimiter", type=str, default=';')
+    parser.add_argument("--delimiter", type=str, default=',')
     parser.add_argument("--bins", type=int, default=20)
     return parser
 
@@ -97,7 +98,7 @@ def scatter_plot_and_save(experiment_name: str,
     
     plt.figure()
     plt.xlabel("REAL")
-    plt.ylabel("PREDITO")
+    plt.ylabel("PREDICTION")
 
     plt.plot(real, pred, 'co')
     
@@ -265,9 +266,9 @@ if __name__ == "__main__":
                                     real, pred, 
                                     args.bins, w)
 
-            # scatter_plot_and_save(experiment_file, real, pred)
+            scatter_plot_and_save(experiment_file, real, pred)
         
-        # plot_and_save_data_histogram(real, args.bins)
+        plot_and_save_data_histogram(real, args.bins)
     
     for key, values in metrics.items():
         print(key)
