@@ -49,17 +49,24 @@ def plot_and_save_histogram(experiment_name: str,
                             bins: int, 
                             weights=None) -> None:
     plt.figure()
-    n1, bins, _ = plt.hist(real, bins=args.bins,
-                                       weights=w, 
-                                       facecolor="#34a2eb",
-                                       edgecolor="#2c5aa3",
-                                       alpha=0.9)
     
-    n2, bins, _ = plt.hist(pred, bins=args.bins, 
-                                       weights=w,
-                                       facecolor="#ffbc47",
-                                    #    edgecolor="#9e742b", 
-                                       alpha=0.6)
+    range_min = min(np.min(real), np.min(pred))
+    range_max = max(np.max(real), np.max(pred))
+    full_range = (range_min, range_max)
+
+    n1, bins, _ = plt.hist(real, bins=bins,
+                                 range=full_range,
+                                 weights=weights, 
+                                 facecolor="#34a2eb",
+                                 edgecolor="#2c5aa3",
+                                 alpha=0.9)
+    
+    n2, bins, _ = plt.hist(pred, bins=bins, 
+                                 range=full_range,
+                                 weights=weights,
+                                 facecolor="#ffbc47",
+                              #    edgecolor="#9e742b", 
+                                 alpha=0.6)
     
     real_patch = mpatches.Patch(color='#34a2eb', label='y')
     pred_patch = mpatches.Patch(color='#ffbc47', label='ŷ')
