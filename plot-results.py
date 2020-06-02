@@ -284,5 +284,5 @@ if __name__ == "__main__":
         print()
     
     # plot_rroc_space(metrics, args.dstdir)
-    # plot_rroc_space_zoom(metrics, args.dstdir)
+    plot_rroc_space_zoom(metrics, args.dstdir)
 
