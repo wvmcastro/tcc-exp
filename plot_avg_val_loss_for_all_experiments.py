@@ -20,6 +20,21 @@ EXPERIMENT_NUMBER_BY_NAME = {
     'resnet18-pretrained-super-augmented': 12
 }
 
+LINE_COLOR_BY_EXP = {
+    'alexnet': '#a6cee3',
+    'alexnet-augmented': '#1f78b4',
+    'alexnet-super-augmented': '#b2df8a',
+    'resnet18': '#33a02c',
+    'resnet18-augmented': '#fb9a99',
+    'resnet18-super-augmented': '#e31a1c',
+    'myalexnet-pretrained': '#fdbf6f',
+    'myalexnet-pretrained-augmented': '#ff7f00',
+    'myalexnet-pretrained-super-augmented': '#cab2d6',
+    'resnet18-pretrained': '#6a3d9a',
+    'resnet18-pretrained-augmented': '#ffff99',
+    'resnet18-pretrained-super-augmented': '#b15928'
+}
+
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("exp_dir", type=str, help="directory with all experiment directories")
@@ -40,18 +55,26 @@ if __name__ == '__main__':
                 losses_object = pk.load(fp)
                 
                 if args.limited_epochs is not None:
+                    epochs_start = 5
                     number_of_epochs = args.limited_epochs
                 else:
+                    epochs_start = 5
                     number_of_epochs = len(losses_object['fold#0']["validation_loss"])
                 
-                x = np.linspace(1, number_of_epochs, number_of_epochs)
-                avg_val_losses_by_experiment[experiment_name] = np.zeros(number_of_epochs)
+                x = np.linspace(epochs_start, number_of_epochs, number_of_epochs - epochs_start)
+                avg_val_losses_by_experiment[experiment_name] = np.zeros(number_of_epochs - epochs_start)
+
 
                 for fold in range(NUMBER_OF_FOLDS):
-                    avg_val_losses_by_experiment[experiment_name] += np.array(losses_object[f'fold#{fold}']["validation_loss"][:number_of_epochs])
+                    avg_val_losses_by_experiment[experiment_name] += np.array(losses_object[f'fold#{fold}']["validation_loss"][epochs_start:number_of_epochs])
 
                 avg_val_losses_by_experiment[experiment_name] /= NUMBER_OF_FOLDS
-                plt.plot(x, avg_val_losses_by_experiment[experiment_name], label=f'#{EXPERIMENT_NUMBER_BY_NAME[experiment_name]}')
+
+                # if (EXPERIMENT_NUMBER_BY_NAME[experiment_name] > 6):
+                #     plt.plot(x, avg_val_losses_by_experiment[experiment_name], label=f'#{EXPERIMENT_NUMBER_BY_NAME[experiment_name]}', linestyle='dotted')
+                # else:
+
+                plt.plot(x, avg_val_losses_by_experiment[experiment_name], label=f'#{EXPERIMENT_NUMBER_BY_NAME[experiment_name]}', color=LINE_COLOR_BY_EXP[experiment_name])
 
     # ordering labels in legend by experiment number
     handles, labels = plt.gca().get_legend_handles_labels()
