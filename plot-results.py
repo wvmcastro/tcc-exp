@@ -3,6 +3,7 @@ from typing import Tuple
 from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches   
+import matplotlib.lines as mlines
 import numpy as np
 from scipy.stats import pearsonr
 from natsort import natsorted, ns
@@ -10,6 +11,12 @@ from natsort import natsorted, ns
 from my_utils import make_dir
 
 experiment_model = {
+    1: "AlexNet",
+    2: "AlexNet",
+    3: "AlexNet",
+    4: "ResNet18",
+    5: "ResNet18",
+    6: "ResNet18",
     7: "AlexNet",
     8: "AlexNet",
     9: "AlexNet",
@@ -77,6 +84,7 @@ def plot_and_save_histogram(experiment_name: str,
     intersection = calc_intersections(n1, n2)
     plot_nane = f"{experiment_name}-hist-{intersection}.pdf"
     plt.savefig(plot_nane, bbox_inches="tight")
+    plt.close()
 
 def scatter_plot_and_save(experiment_name: str,
                           real: Tuple,
@@ -93,6 +101,7 @@ def scatter_plot_and_save(experiment_name: str,
 
     plot_name = f"{experiment_name}-scatter.pdf"
     plt.savefig(plot_name, bbox_inches="tight")
+    plt.close()
 
 def mean_absolute_percentage_error(y_true, y_pred): 
     y_true, y_pred = np.array(y_true), np.array(y_pred)
@@ -149,18 +158,24 @@ def plot_rroc_space(metrics: dict, dstdir):
     plt.xlabel("OVER")
     plt.ylabel("UNDER")
 
+    # plotting point
     for i, p in enumerate(zip(x,y)):
         index = int(names[i].strip('#'))
         model = experiment_model[index]
         plt.plot(p[0], p[1], colors[model]+'x', label=names[i] + " " + model, markersize='12.0', markeredgewidth=2.0)
     
+    # plotting name beside point
     for i, name in enumerate(names):
         model = experiment_model[int(name.strip("#"))]
-        plt.text(x[i]+4, y[i]+4, name, color=colors[model], fontsize=9)
+        plt.text(x[i]+4, y[i]+4, name, color='k', fontsize=9)
 
-    plt.legend(loc='upper right', shadow=False)
+    legend_elements = [mlines.Line2D([], [], color='c',  marker='x', linestyle='None', label='AlexNet',markersize='12.0', markeredgewidth=2.0),
+     mlines.Line2D([], [], color='r',  marker='x', linestyle='None', label='ResNet18', markersize='12.0', markeredgewidth=2.0)]
+
+    plt.legend(handles=legend_elements)
 
     plt.savefig(f"{dstdir}rroc.pdf")
+    plt.close()
 
 
 if __name__ == "__main__":
