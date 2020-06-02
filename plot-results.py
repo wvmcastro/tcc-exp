@@ -125,10 +125,10 @@ def get_metrics(real: Tuple, pred: Tuple) -> Tuple:
     mean_abs_error = (over - under) / n
     mse = np.sum([e**2 for e in overs+unders])
     mape = mean_absolute_percentage_error(real, pred)
-    correlation = pearsonr(real, pred)
+    correlation = pearsonr(real, pred)[0]
 
     metrics = {"over": over, "under": under, "mean_error": mean_error,
-               "MAE": mean_abs_error, "MSE": mse, "MAPE": mape, "Pearson's Correlation": correlation}
+               "MAE": mean_abs_error, "MSE": mse, "MAPE": mape, "Pearson Correlation": correlation}
     
     return metrics
 
@@ -208,6 +208,7 @@ if __name__ == "__main__":
     for key, values in metrics.items():
         print(key)
         print(values)
+        # print(f'{key.strip("experiment")} & {values["MAE"]} & {values["MSE"]} & {values["Pearson Correlation"]} & {values["MAPE"]}')
         print("-"*15)
         print()
     
