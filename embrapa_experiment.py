@@ -83,10 +83,28 @@ def get_mobilenetv2():
 
 def get_vggnet11():
     net = vgg11_bn(pretrained=False)
+    net.classifier = nn.Sequential(
+        nn.Linear(512 * 7 * 7, 4096),
+        nn.ReLU(True),
+        nn.Dropout(),
+        nn.Linear(4096, 4096),
+        nn.ReLU(True),
+        nn.Dropout(),
+        nn.Linear(4096, 1000),
+        nn.Linear(1000, 1))
     return net
 
 def get_vggnet11_pretrained():
     net = vgg11_bn(pretrained=True)
+    net.classifier = nn.Sequential(
+        nn.Linear(512 * 7 * 7, 4096),
+        nn.ReLU(True),
+        nn.Dropout(),
+        nn.Linear(4096, 4096),
+        nn.ReLU(True),
+        nn.Dropout(),
+        nn.Linear(4096, 1000),
+        nn.Linear(1000, 1))
     return net
 
 def save_predictions(indexes, predictions_list, csvfile) -> None:
