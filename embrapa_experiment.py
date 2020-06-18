@@ -5,6 +5,7 @@ import pickle as pk
 
 from torchvision.models.alexnet import alexnet
 from torchvision.models.resnet import resnet18
+from torchvision.models import vgg11_bn
 import torch
 import torch.nn as nn
 
@@ -80,6 +81,14 @@ def get_mobilenetv2():
     net = MobileNetV2()
     return net
 
+def get_vggnet11():
+    net = vgg11_bn(pretrained=False)
+    return net
+
+def get_vggnet11_pretrained():
+    net = vgg11_bn(pretrained=True)
+    return net
+
 def save_predictions(indexes, predictions_list, csvfile) -> None:
     for predictions in predictions_list:
         pred = [p.item() for p in predictions]
@@ -112,7 +121,7 @@ def plot_average_validation_loss(losses, number_of_epochs, number_of_folds, file
 if __name__ == "__main__":    
     parser = ArgumentParser()
     parser.add_argument("model", type=str, 
-                        help="supported models: alexnet or resnet18")
+                        help="supported models: alexnet, resnet18 or vggnet11")
     parser.add_argument("dataset_folder", type=str)
     parser.add_argument("--experiment_folder", type=str, default="")
     parser.add_argument("--epochs", type=int, default=1)
@@ -142,6 +151,10 @@ if __name__ == "__main__":
         get_model = get_myalexnet_pretrained
     elif args.model == "resnet18pretrained":
         get_model = get_resnet18_pretrained
+    elif args.model == "vggnet11":
+        get_model = get_vggnet11
+    elif args.model == "vggnet11pretrained":
+        get_model = get_vggnet11_pretrained
 
     folder = args.experiment_folder
 
