@@ -92,6 +92,7 @@ def get_vggnet11():
         nn.Dropout(),
         nn.Linear(4096, 1000),
         nn.Linear(1000, 1))
+    net.name = "VGGNet11"
     return net
 
 def get_vggnet11_pretrained():
@@ -105,6 +106,7 @@ def get_vggnet11_pretrained():
         nn.Dropout(),
         nn.Linear(4096, 1000),
         nn.Linear(1000, 1))
+    net.name = "VGGNet11Pretrained"
     return net
 
 def save_predictions(indexes, predictions_list, csvfile) -> None:
