@@ -17,22 +17,25 @@ EXPERIMENT_NUMBER_BY_NAME = {
     'myalexnet-pretrained-super-augmented': 9,
     'resnet18-pretrained': 10,
     'resnet18-pretrained-augmented': 11,
-    'resnet18-pretrained-super-augmented': 12
+    'resnet18-pretrained-super-augmented': 12,
+    'vggnet11-pretrained-super-augmented': 13
 }
 
+# https://sashamaps.net/docs/tools/20-colors/
 LINE_COLOR_BY_EXP = {
-    'alexnet': '#a6cee3',
-    'alexnet-augmented': '#1f78b4',
-    'alexnet-super-augmented': '#b2df8a',
-    'resnet18': '#33a02c',
-    'resnet18-augmented': '#fb9a99',
-    'resnet18-super-augmented': '#e31a1c',
-    'myalexnet-pretrained': '#fdbf6f',
-    'myalexnet-pretrained-augmented': '#ff7f00',
-    'myalexnet-pretrained-super-augmented': '#cab2d6',
-    'resnet18-pretrained': '#6a3d9a',
-    'resnet18-pretrained-augmented': '#ffff99',
-    'resnet18-pretrained-super-augmented': '#b15928'
+    'alexnet': '#e6194B',
+    'alexnet-augmented': '#3cb44b',
+    'alexnet-super-augmented': '#ffe119',
+    'resnet18': '#4363d8',
+    'resnet18-augmented': '#f58231',
+    'resnet18-super-augmented': '#911eb4',
+    'myalexnet-pretrained': '#42d4f4',
+    'myalexnet-pretrained-augmented': '#f032e6',
+    'myalexnet-pretrained-super-augmented': '#bfef45',
+    'resnet18-pretrained': '#fabed4',
+    'resnet18-pretrained-augmented': '#469990',
+    'resnet18-pretrained-super-augmented': '#dcbeff',
+    'vggnet11-pretrained-super-augmented': '#9A6324'
 }
 
 if __name__ == '__main__':
@@ -78,8 +81,10 @@ if __name__ == '__main__':
 
     # ordering labels in legend by experiment number
     handles, labels = plt.gca().get_legend_handles_labels()
+    print('handles:', handles)
+    print('labels:', labels)
     order = [labels.index('#1'), labels.index('#2'), labels.index('#3'), labels.index('#4'), labels.index('#5'), labels.index('#6'),
-     labels.index('#7'), labels.index('#8'), labels.index('#9'), labels.index('#10'), labels.index('#11'), labels.index('#12')]
+     labels.index('#7'), labels.index('#8'), labels.index('#9'), labels.index('#10'), labels.index('#11'), labels.index('#12'), labels.index('#13')]
     plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order])
     
     plt.savefig('all-experiments-avg-val-loss.pdf')
