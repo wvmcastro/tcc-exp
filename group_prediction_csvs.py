@@ -15,9 +15,9 @@ EXPERIMENT_NUMBER_BY_NAME = {
     'myalexnet-pretrained-super-augmented': 9,
     'resnet18-pretrained': 10,
     'resnet18-pretrained-augmented': 11,
-    'test-walk-1': 22,
-    'test-walk-2': 33,
-    'resnet18-pretrained-super-augmented': 12
+    'resnet18-pretrained-super-augmented': 12,
+    'vggnet11-pretrained-super-augmented': 13,
+    'vggnet11-super-augmented': 14
 }
 
 def build_ordered_csv_predictions_file_with_id_real_pred_columns(raw_predictions_filename: str, real_values_filename: str,
