@@ -22,7 +22,8 @@ experiment_model = {
     9: "AlexNet",
     10: "ResNet18",
     11: "ResNet18",
-    12: "ResNet18"
+    12: "ResNet18",
+    13: "VGGNet11"
 }
 
 def make_parse() -> ArgumentParser:
@@ -151,7 +152,7 @@ def plot_rroc_space(metrics: dict, dstdir):
     p = np.linspace(0, 1.8*l, 100)
     plt.plot(p, -p, dashes=dashes, color="#cccccc")
 
-    colors = {"AlexNet": 'c', "ResNet18":'r'}
+    colors = {"AlexNet": 'c', "ResNet18":'r', 'VGGNet11': 'g'}
 
     plt.xlim((0, 1.1*l))
     plt.ylim((-1.1*l, 0))
@@ -170,7 +171,8 @@ def plot_rroc_space(metrics: dict, dstdir):
         plt.text(x[i]+4, y[i]+4, name, color='k', fontsize=9)
 
     legend_elements = [mlines.Line2D([], [], color='c',  marker='x', linestyle='None', label='AlexNet',markersize='12.0', markeredgewidth=2.0),
-     mlines.Line2D([], [], color='r',  marker='x', linestyle='None', label='ResNet18', markersize='12.0', markeredgewidth=2.0)]
+     mlines.Line2D([], [], color='r',  marker='x', linestyle='None', label='ResNet18', markersize='12.0', markeredgewidth=2.0),
+     mlines.Line2D([], [], color='g',  marker='x', linestyle='None', label='VGGNet11', markersize='12.0', markeredgewidth=2.0)]
 
     plt.legend(handles=legend_elements)
 
