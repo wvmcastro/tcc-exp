@@ -92,12 +92,14 @@ def scatter_plot_and_save(experiment_name: str,
                           pred: Tuple) -> None:
     
     plt.figure()
+    plt.rc('font', size=16)          # controls default text sizes
     plt.xlabel("REAL")
     plt.ylabel("PREDICTION")
 
     plt.plot(real, pred, 'co')
     
     dashes = [5, 5, 5, 5]
+    
     plt.plot(real, real, dashes=dashes, color="#cccccc")
 
     plot_name = f"{experiment_name}-scatter.pdf"
