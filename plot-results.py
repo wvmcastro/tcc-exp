@@ -7,6 +7,7 @@ import matplotlib.lines as mlines
 import numpy as np
 from scipy.stats import pearsonr
 from natsort import natsorted, ns
+from math import sqrt
 
 from my_utils import make_dir
 
@@ -22,7 +23,8 @@ experiment_model = {
     9: "AlexNet",
     10: "ResNet18",
     11: "ResNet18",
-    12: "ResNet18"
+    12: "ResNet18",
+    13: "MaCNN"
 }
 
 def make_parse() -> ArgumentParser:
@@ -124,11 +126,12 @@ def get_metrics(real: Tuple, pred: Tuple) -> Tuple:
     mean_error = (over + under) / n
     mean_abs_error = (over - under) / n
     mse = np.sum([e**2 for e in overs+unders])
+    rmse = sqrt(mse)
     mape = mean_absolute_percentage_error(real, pred)
     correlation = pearsonr(real, pred)[0]
 
     metrics = {"over": over, "under": under, "mean_error": mean_error,
-               "MAE": mean_abs_error, "MSE": mse, "MAPE": mape, "Pearson Correlation": correlation}
+               "MAE": mean_abs_error, "MSE": mse, "MAPE": mape, "RMSE": rmse, "Pearson Correlation": correlation}
     
     return metrics
 

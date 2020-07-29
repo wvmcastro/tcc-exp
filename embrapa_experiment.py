@@ -16,6 +16,17 @@ from Alexnet import AlexNet
 from resnets import ResNet18
 from Mobilenet import MobileNetV2
 from datasets import EmbrapaP2Dataset
+from MaCNN import MaCNN, LfCNN
+
+def get_MaCNN():
+    net = MaCNN(1)
+    net.name = "MaCNN"
+    return net
+    
+def get_lfCnn():
+    net = LfCNN(1)
+    net.name = "lfcnn"
+    return net
 
 def get_imagent_alexNet():
     net = alexnet(pretrained=True)
@@ -175,7 +186,11 @@ if __name__ == "__main__":
         get_model = get_vggnet11
     elif args.model == "vggnet11pretrained":
         get_model = get_vggnet11_pretrained
-
+    elif args.model == "MaCNN":
+        get_model = get_MaCNN
+    elif args.model == "lfcnn":
+        get_model = get_lfCnn
+    
     folder = args.experiment_folder
 
     make_dir(folder)

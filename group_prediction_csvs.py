@@ -17,7 +17,8 @@ EXPERIMENT_NUMBER_BY_NAME = {
     'resnet18-pretrained-augmented': 11,
     'resnet18-pretrained-super-augmented': 12,
     'vggnet11-pretrained-super-augmented': 13,
-    'vggnet11-super-augmented': 14
+    'vggnet11-super-augmented': 14,
+    'MaCNN-super-augmented': 15
 }
 
 def build_ordered_csv_predictions_file_with_id_real_pred_columns(raw_predictions_filename: str, real_values_filename: str,
@@ -47,14 +48,11 @@ if __name__ == '__main__':
     parser.add_argument("out_dir", type=str, help="directory to be created to store csvs")
     parser.add_argument("--real_values_filename", type=str, default="", help="csv file with real values")
     args = parser.parse_args()
-
     raw_named_csvs_dir = f'{args.out_dir}/raw-named-csvs'
     raw_numbered_csvs = f'{args.out_dir}/raw-numbered-csvs'
-    
     make_dir(args.out_dir)
     make_dir(raw_named_csvs_dir)
     make_dir(raw_numbered_csvs)
-
     if args.real_values_filename != "":
         id_real_pred_numbered_csvs = f'{args.out_dir}/id-real-pred-numbered-csvs'
         make_dir(id_real_pred_numbered_csvs)

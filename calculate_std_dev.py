@@ -4,7 +4,7 @@ import numpy as np
 from typing import Tuple
 from scipy.stats import pearsonr
 from natsort import natsorted, ns
-
+from math import sqrt
 NUMBER_OF_FOLDS = 10
 
 def make_parse() -> ArgumentParser:
@@ -46,7 +46,7 @@ def get_std_devs(real: Tuple, pred: Tuple) -> Tuple:
     all_mse = []
     all_mape = []
     all_correlations = []
-
+    all_rmse = []
     real_divided_by_fold = split(real, NUMBER_OF_FOLDS)
     pred_divided_by_fold = split(pred, NUMBER_OF_FOLDS)
 
@@ -69,13 +69,15 @@ def get_std_devs(real: Tuple, pred: Tuple) -> Tuple:
         all_mean_abs_errors.append(mean_abs_error)
         mse = np.sum([e**2 for e in overs+unders])
         all_mse.append(mse)
+        rmse = srqt(mse)
+        all_rmse.append(rmse)
         mape = mean_absolute_percentage_error(real_values_in_fold, pred_divided_by_fold[fold_index])
         all_mape.append(mape)
         correlation = pearsonr(real_values_in_fold, pred_divided_by_fold[fold_index])[0]
         all_correlations.append(correlation)
 
     std_devs = {"mean_error": np.std(all_mean_errors),
-               "MAE": np.std(all_mean_abs_errors), "MSE": np.std(all_mse), "MAPE": np.std(all_mape), "Pearson Correlation": np.std(all_correlations)}
+               "MAE": np.std(all_mean_abs_errors), "MSE": np.std(all_mse), "MAPE": np.std(all_mape), "RMSE": np.std(all_rmse), "Pearson Correlation": np.std(all_correlations)}
     
     return std_devs
 
@@ -99,6 +101,6 @@ if __name__ == "__main__":
     for key, values in std_devs_by_metric.items():
         # print(key)
         # print(values)
-        print(f'{key.strip("experiment")} & {values["MAE"]} & {values["MSE"]} & {values["Pearson Correlation"]} & {values["MAPE"]}')
+        print(f'{key.strip("experiment")} & {values["MAE"]} & {values["MSE"]} & {values["Pearson Correlation"]} & {values["MAPE"]} &{values["RMSE"]}')
         # print("-"*15)
         print()
