@@ -2,6 +2,8 @@ from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle as pk
+import time
+import sys
 
 from torchvision.models.alexnet import alexnet
 from torchvision.models.resnet import resnet18
@@ -161,6 +163,8 @@ if __name__ == "__main__":
     parser.add_argument("--augment", type=str, default="no", help="options: no, yes, super")
     parser.add_argument("--epochs_between_checkpoints", type=int, default=100)
     parser.add_argument("--cuda_device_number", type=int, default=0)
+    parser.add_argument('--only_one_fold', dest='only_one_fold', action='store_true')
+    parser.set_defaults(only_one_fold=False)
 
     args = parser.parse_args()
 
@@ -227,13 +231,23 @@ if __name__ == "__main__":
 
         checkpoints_list = create_checkpoints_list(args.epochs_between_checkpoints, args.epochs)
 
+        training_start_time = time.time()
+
         training_loss, test_loss = train(model, opt,  nn.MSELoss(), dltrain, dltest, 
                                          args.epochs, lr_schedular=None,
                                          cuda=True, logfile=mylogfile,
                                          checkpoints=checkpoints_list,
                                          checkpoints_folder=chkpt_folder)
 
+        training_end_time = time.time()
+
+        print_and_log((f"Training time: {training_end_time - training_start_time} seconds = {(training_end_time - training_start_time)/60} minutes", "\n"), mylogfile)
+
+        evaluation_start_time = time.time()
         predictions, loss = evaluate(model, dltest, nn.MSELoss())
+        evaluation_end_time = time.time()
+        print_and_log((f"Evaluation time: {evaluation_end_time - evaluation_start_time} seconds = {(evaluation_end_time - evaluation_start_time)/60} minutes", "\n"), mylogfile)
+
         folds_losses.append(loss)
 
         print_and_log((f"Test Loss: {loss}", "\n"), mylogfile)
@@ -253,6 +267,9 @@ if __name__ == "__main__":
         plt.savefig(folder+f"fold{k}-training-test-loss.pdf")
 
         losses[f"fold#{k}"] = {"training_loss": training_loss, "validation_loss": test_loss}
+
+        if(args.only_one_fold and k == 0):
+            sys.exit()
 
     plot_average_validation_loss(losses, args.epochs, 10, folder+"avg_validation_loss.pdf")
 

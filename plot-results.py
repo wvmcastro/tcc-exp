@@ -24,7 +24,9 @@ experiment_model = {
     10: "ResNet18",
     11: "ResNet18",
     12: "ResNet18",
-    13: "MaCNN"
+    13: "VGGNet11",
+    14: "LfCNN",
+    15: "MaCNN"
 }
 
 def make_parse() -> ArgumentParser:
@@ -61,8 +63,15 @@ def plot_and_save_histogram(experiment_name: str,
                             weights=None) -> None:
     plt.figure()
     
+    # controls default text sizes
+    plt.rc('font', size=16)          
+    
     range_min = min(np.min(real), np.min(pred))
     range_max = max(np.max(real), np.max(pred))
+
+    # hard-coding axis' max values (min, max)
+    # plt.ylim(0, 0.3)
+
     full_range = (range_min, range_max)
 
     n1, bins, _ = plt.hist(real, bins=bins,
@@ -93,12 +102,19 @@ def scatter_plot_and_save(experiment_name: str,
                           pred: Tuple) -> None:
     
     plt.figure()
+
+    # controls default text sizes
+    plt.rc('font', size=16)          
+
+    # hard-coding axis' max values [xmin, xmax, ymin, ymax]
+    # plt.axis([0, 15000, 0, 17500])
+
     plt.xlabel("REAL")
     plt.ylabel("PREDICTION")
 
-    plt.plot(real, pred, 'co')
-    
+    plt.plot(real, pred, 'co')    
     dashes = [5, 5, 5, 5]
+    
     plt.plot(real, real, dashes=dashes, color="#cccccc")
 
     plot_name = f"{experiment_name}-scatter.pdf"
@@ -154,7 +170,7 @@ def plot_rroc_space(metrics: dict, dstdir):
     p = np.linspace(0, 1.8*l, 100)
     plt.plot(p, -p, dashes=dashes, color="#cccccc")
 
-    colors = {"AlexNet": 'c', "ResNet18":'r'}
+    colors = {"AlexNet": 'c', "ResNet18":'r', 'VGGNet11': 'g'}
 
     plt.xlim((0, 1.1*l))
     plt.ylim((-1.1*l, 0))
@@ -173,7 +189,8 @@ def plot_rroc_space(metrics: dict, dstdir):
         plt.text(x[i]+4, y[i]+4, name, color='k', fontsize=9)
 
     legend_elements = [mlines.Line2D([], [], color='c',  marker='x', linestyle='None', label='AlexNet',markersize='12.0', markeredgewidth=2.0),
-     mlines.Line2D([], [], color='r',  marker='x', linestyle='None', label='ResNet18', markersize='12.0', markeredgewidth=2.0)]
+     mlines.Line2D([], [], color='r',  marker='x', linestyle='None', label='ResNet18', markersize='12.0', markeredgewidth=2.0),
+     mlines.Line2D([], [], color='g',  marker='x', linestyle='None', label='VGGNet11', markersize='12.0', markeredgewidth=2.0)]
 
     plt.legend(handles=legend_elements)
 
