@@ -60,8 +60,15 @@ def plot_and_save_histogram(experiment_name: str,
                             weights=None) -> None:
     plt.figure()
     
+    # controls default text sizes
+    plt.rc('font', size=16)          
+    
     range_min = min(np.min(real), np.min(pred))
     range_max = max(np.max(real), np.max(pred))
+
+    # hard-coding axis' max values (min, max)
+    # plt.ylim(0, 0.3)
+
     full_range = (range_min, range_max)
 
     n1, bins, _ = plt.hist(real, bins=bins,
@@ -92,12 +99,17 @@ def scatter_plot_and_save(experiment_name: str,
                           pred: Tuple) -> None:
     
     plt.figure()
-    plt.rc('font', size=16)          # controls default text sizes
+
+    # controls default text sizes
+    plt.rc('font', size=16)          
+
+    # hard-coding axis' max values [xmin, xmax, ymin, ymax]
+    # plt.axis([0, 15000, 0, 17500])
+
     plt.xlabel("REAL")
     plt.ylabel("PREDICTION")
 
-    plt.plot(real, pred, 'co')
-    
+    plt.plot(real, pred, 'co')    
     dashes = [5, 5, 5, 5]
     
     plt.plot(real, real, dashes=dashes, color="#cccccc")
