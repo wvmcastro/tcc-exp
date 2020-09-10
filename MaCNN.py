@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import cv2
+
 '''
 CNN from paper Ma2019
 '''
@@ -53,15 +53,16 @@ class LfCNN(nn.Module):
         )
 
         self.classifier1 = nn.Sequential(
-            nn.Linear(16, 1), 
+            nn.Linear(166656, 1), 
             nn.Linear(1,16)
         )
 
         self.classifier2 = nn.Sequential(
-        	nn.Linear(16,1)
+        	nn.Linear(48,1)
         )
     def forward(self,x):
-        b,g,r = cv2.split(x)
+        aux = x
+        b,g,r = torch.chunk(x,3,1)
         r = self.features(r)
         r = torch.flatten(r, 1)
         r = self.classifier1(r)
@@ -74,6 +75,6 @@ class LfCNN(nn.Module):
         b = torch.flatten(b, 1)
         b = self.classifier1(b)
 
-        x = cv2.merge((b,g,r))
+        x = torch.cat((b,g,r), 1)
         x = self.classifier2(x)
         return x

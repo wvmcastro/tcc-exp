@@ -18,7 +18,8 @@ EXPERIMENT_NUMBER_BY_NAME = {
     'resnet18-pretrained-super-augmented': 12,
     'vggnet11-pretrained-super-augmented': 13,
     'vggnet11-super-augmented': 14,
-    'MaCNN-super-augmented': 15
+    'MaCNN-super-augmented': 15,
+    'lfcnn-super-augmented': 16
 }
 
 def build_ordered_csv_predictions_file_with_id_real_pred_columns(raw_predictions_filename: str, real_values_filename: str,

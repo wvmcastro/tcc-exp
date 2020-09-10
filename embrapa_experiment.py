@@ -8,6 +8,7 @@ import sys
 from torchvision.models.alexnet import alexnet
 from torchvision.models.resnet import resnet18
 from torchvision.models import vgg11_bn
+from torchvision.models import resnext50_32x4d
 import torch
 import torch.nn as nn
 
@@ -74,6 +75,12 @@ def get_resnet18():
     net.name = "ResNet18"
     return net
 
+def get_resnext50():
+    net = resnext50_32x4d(pretrained=False)
+    net.fc = nn.Linear(512, 1)
+    net.name = "ResNext50"
+    return net
+    
 def get_my_resnet():
     net = ResNet18(1)
     regressor = nn.Sequential(
@@ -194,6 +201,8 @@ if __name__ == "__main__":
         get_model = get_MaCNN
     elif args.model == "lfcnn":
         get_model = get_lfCnn
+    elif args.model == "resnext50":
+        get_model = get_resnext50
     
     folder = args.experiment_folder
 
