@@ -77,7 +77,7 @@ def get_resnet18():
 
 def get_resnext50():
     net = resnext50_32x4d(pretrained=False)
-    net.fc = nn.Linear(512, 1)
+    net.fc = nn.Linear(net.fc.in_features, 1)
     net.name = "ResNext50"
     return net
     
