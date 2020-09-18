@@ -8,7 +8,7 @@ import sys
 from torchvision.models.alexnet import alexnet
 from torchvision.models.resnet import resnet18
 from torchvision.models import vgg11_bn
-from torchvision.models import resnext50_32x4d
+from torchvision.models import resnext50_32x4d, resnext101_32x8d
 import torch
 import torch.nn as nn
 
@@ -77,10 +77,29 @@ def get_resnet18():
 
 def get_resnext50():
     net = resnext50_32x4d(pretrained=False)
-    net.fc = nn.Linear(512, 1)
+    net.fc = nn.Linear(net.fc.in_features, 1)
     net.name = "ResNext50"
     return net
     
+def get_resnext101():
+    net = resnext101_32x8d(pretrained=False)
+    net.fc = nn.Linear(net.fc.in_features, 1)
+    net.name = "ResNext101"
+    return net
+
+def get_resnext50_pretrained():
+    # eu nao apoio essa distinção de pretreinado ou não >:(
+    net = resnext50_32x4d(pretrained=True)
+    net.fc = nn.Linear(net.fc.in_features, 1)
+    net.name = "ResNext50Pretrained"
+    return net
+    
+def get_resnext101_pretrained():
+    net = resnext101_32x8d(pretrained=True)
+    net.fc = nn.Linear(net.fc.in_features, 1)
+    net.name = "ResNext101Pretrained"
+    return net  
+
 def get_my_resnet():
     net = ResNet18(1)
     regressor = nn.Sequential(
@@ -203,6 +222,12 @@ if __name__ == "__main__":
         get_model = get_lfCnn
     elif args.model == "resnext50":
         get_model = get_resnext50
+    elif args.model == "resnext101":
+        get_model = get_resnext101
+    elif args.model == "resnext50pretrained":
+        get_model = get_resnext50_pretrained
+    elif args.model == "resnext101pretrained":
+        get_model = get_resnext101_pretrained
     
     folder = args.experiment_folder
 

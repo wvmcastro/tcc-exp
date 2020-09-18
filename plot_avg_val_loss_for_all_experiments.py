@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import pickle as pk
 import numpy as np
 
+# TODO: Adicionar cores para outras redes implementadas no futuro no futuro
+
 NUMBER_OF_FOLDS = 10
 EXPERIMENT_NUMBER_BY_NAME = {
     'alexnet': 1,
