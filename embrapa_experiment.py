@@ -84,7 +84,7 @@ def get_resnext50():
 def get_resnext101():
     net = resnext101_32x8d(pretrained=False)
     net.fc = nn.Linear(net.fc.in_features, 1)
-    net.name = "ResNext50"
+    net.name = "ResNext101"
     return net
 
 def get_resnext50_pretrained():
