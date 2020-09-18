@@ -11,6 +11,9 @@ from math import sqrt
 
 from my_utils import make_dir
 
+# Os números e nomes devem coincidir com a numeração do EXPERIMENT_NUMBER_BY_NAME do
+# group_prediction_csvs.py
+
 experiment_model = {
     1: "AlexNet",
     2: "AlexNet",
@@ -25,8 +28,21 @@ experiment_model = {
     11: "ResNet18",
     12: "ResNet18",
     13: "VGGNet11",
-    14: "LfCNN",
-    15: "MaCNN"
+    14: "VGGNet11",
+    15: "MaCNN",
+    16: "LfCNN",
+    17: "ResNext50",
+    18: "ResNext50",
+    19: "ResNext50",
+    20: "ResNext50",
+    21: "ResNext50",
+    22: "ResNext50",
+    23: "ResNext101",
+    24: "ResNext101",
+    25: "ResNext101",
+    26: "ResNext101",
+    27: "ResNext101",
+    28: "ResNext101",
 }
 
 def make_parse() -> ArgumentParser:

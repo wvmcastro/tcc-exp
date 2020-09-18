@@ -3,6 +3,8 @@ from argparse import ArgumentParser
 from my_utils import make_dir
 from shutil import copyfile
 
+# Usar estas strings abaixo como nome de projetos gerados pelo embrapa_experiment.py!
+
 EXPERIMENT_NUMBER_BY_NAME = {
     'alexnet': 1,
     'alexnet-augmented': 2,
@@ -19,7 +21,19 @@ EXPERIMENT_NUMBER_BY_NAME = {
     'vggnet11-pretrained-super-augmented': 13,
     'vggnet11-super-augmented': 14,
     'MaCNN-super-augmented': 15,
-    'lfcnn-super-augmented': 16
+    'lfcnn-super-augmented': 16,
+    'resnext50': 17,
+    'resnext50-augmented': 18,
+    'resnext50-super-augmented': 19,
+    'resnext50-pretrained': 20,
+    'resnext50-pretrained-augmented': 21,
+    'resnext50-pretrained-super-augmented': 22,
+    'resnext101': 23,
+    'resnext101-augmented': 24,
+    'resnext101-super-augmented': 25,
+    'resnext101-pretrained': 26,
+    'resnext101-pretrained-augmented': 27,
+    'resnext101-pretrained-super-augmented': 28
 }
 
 def build_ordered_csv_predictions_file_with_id_real_pred_columns(raw_predictions_filename: str, real_values_filename: str,
