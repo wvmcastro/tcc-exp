@@ -164,6 +164,9 @@ def create_checkpoints_list(epochs_between_checkpoints, epochs):
     return checkpoints_list
 
 def plot_average_validation_loss(losses, number_of_epochs, number_of_folds, filename):
+
+    # TODO: Implementar novamente a partir do csv
+
     x = np.linspace(1, number_of_epochs, number_of_epochs)
 
     average_validation_loss = np.zeros(number_of_epochs)
@@ -243,20 +246,21 @@ if __name__ == "__main__":
     # Registro de informações de cada fold
     raw_fold_info = {
         "fold": [],
-        "train_losses": [],
-        "test_losses": []
+        "epoch": [],
+        "train_loss": [],
+        "test_loss": []
     }
 
     # Informações sumarizadas de cada fold
     summarized_fold_info = {
         "fold": [],
-        "losses": []
+        "loss": []
     }
 
     # Informações de predição
     predictions_info = {
-        "test_indexes": [],
-        "predictions": []
+        "test_index": [],
+        "prediction": []
     }
 
     for k in range(10):
@@ -313,14 +317,15 @@ if __name__ == "__main__":
 
         # Atualizando informações a serializar
         raw_fold_info["fold"].extend([k]*len(training_loss))
-        raw_fold_info["train_losses"].extend(training_loss)
-        raw_fold_info["test_losses"].extend(test_loss)
+        raw_fold_info["epoch"].extend(list(range(len(training_loss))))
+        raw_fold_info["train_loss"].extend(training_loss)
+        raw_fold_info["test_loss"].extend(test_loss)
 
         summarized_fold_info["fold"].append(k)
-        summarized_fold_info["losses"].append(loss)
+        summarized_fold_info["loss"].append(loss)
 
-        predictions_info["test_indexes"].extend(test_indexes)
-        predictions_info["predictions"].extend(predictions)
+        predictions_info["test_index"].extend([index + 1 for index in test_indexes])
+        predictions_info["prediction"].extend(predictions)
         
 
         # losses[f"fold#{k}"] = {"training_loss": training_loss, "validation_loss": test_loss}
