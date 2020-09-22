@@ -86,7 +86,7 @@ def save_model(model: BaseConvNet, epoch:int, folder: str) -> None:
 def evaluate(model, 
          data: torch.utils.data.DataLoader,
          loss: torch.nn.modules.loss._Loss, 
-         cuda: bool = True):
+         cuda: bool = True) -> Tuple[List[float], float]:
     if cuda == True:
         model = model.cuda()
 
@@ -104,7 +104,9 @@ def evaluate(model,
             l = loss(pred.view(-1), y)
             
             sum_loss += l.item()
-            predictions.append(pred)
+            # TODO: alteração feita aqui, potencial pipoco
+            print(f"Teste de shape de predição: {pred.shape}")
+            predictions.extend(pred)
             i += 1
     
     return predictions, sum_loss/i

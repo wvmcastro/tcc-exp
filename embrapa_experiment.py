@@ -12,7 +12,7 @@ from torchvision.models import resnext50_32x4d, resnext101_32x8d
 import torch
 import torch.nn as nn
 
-from my_utils import get_folds, print_and_log, make_dir
+from my_utils import get_folds, print_and_log, make_dir, save_info
 from my_utils_regression import train, evaluate
 
 from Alexnet import AlexNet
@@ -152,6 +152,7 @@ def save_predictions(indexes, predictions_list, csvfile) -> None:
     for predictions in predictions_list:
         pred = [p.item() for p in predictions]
         for index, pred in zip(indexes, predictions):
+            # TODO: Esse +1 deve servir para algo!!!!!!
             csvfile.write(f"{index+1}, {pred.item()}\n")
 
 def create_checkpoints_list(epochs_between_checkpoints, epochs):
@@ -235,22 +236,43 @@ if __name__ == "__main__":
 
     n = len(EmbrapaP2Dataset(args.dataset_folder))
 
-    csv = open(folder+"predictions.csv", "w+")
+    # csv = open(folder+"predictions.csv", "w+")
 
     folds = get_folds(n, 10)
-    folds_losses = []
-    losses = dict()
+
+    # Registro de informações de cada fold
+    raw_fold_info = {
+        "fold": [],
+        "train_losses": [],
+        "test_losses": []
+    }
+
+    # Informações sumarizadas de cada fold
+    summarized_fold_info = {
+        "fold": [],
+        "losses": []
+    }
+
+    # Informações de predição
+    predictions_info = {
+        "test_indexes": [],
+        "predictions": []
+    }
+
     for k in range(10):
+
         mylogfile = folder + f"fold{k}.log"
         print_and_log((f"Fold #{k}",), mylogfile)
 
-
+        # Preparação dos folds
         train_indexes = []
         for n in range(10):
             if n != k:
                 train_indexes += folds[n]
+
         test_indexes = folds[k]
 
+        # Criação dos DataLoaders de treino e avaliação
         dltrain = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, train_indexes, augment=args.augment), 
                                                 shuffle=True, batch_size=args.batch_size)
         dltest = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, test_indexes), 
@@ -267,6 +289,7 @@ if __name__ == "__main__":
 
         training_start_time = time.time()
 
+        # Treinamento em K-1 folds e avaliação no K-ésimo
         training_loss, test_loss = train(model, opt,  nn.MSELoss(), dltrain, dltest, 
                                          args.epochs, lr_schedular=None,
                                          cuda=True, logfile=mylogfile,
@@ -282,42 +305,50 @@ if __name__ == "__main__":
         evaluation_end_time = time.time()
         print_and_log((f"Evaluation time: {evaluation_end_time - evaluation_start_time} seconds = {(evaluation_end_time - evaluation_start_time)/60} minutes", "\n"), mylogfile)
 
-        folds_losses.append(loss)
+        # folds_losses.append(loss)
 
         print_and_log((f"Test Loss: {loss}", "\n"), mylogfile)
 
-        save_predictions(test_indexes, predictions, csv)
-        
-        x = np.linspace(1, len(training_loss), len(training_loss))
-        fig, axs = plt.subplots(2)
-        
-        axs[0].set_title("Training Loss")
-        axs[0].plot(x, training_loss, c='c')
+        # save_predictions(test_indexes, predictions, csv)
 
-        axs[1].set_title("Validation Loss")
-        axs[1].plot(x, test_loss, c='m')
+        # Atualizando informações a serializar
+        raw_fold_info["fold"].extend([k]*len(training_loss))
+        raw_fold_info["train_losses"].extend(training_loss)
+        raw_fold_info["test_losses"].extend(test_loss)
+
+        summarized_fold_info["fold"].append(k)
+        summarized_fold_info["losses"].append(loss)
+
+        predictions_info["test_indexes"].extend(test_indexes)
+        predictions_info["predictions"].extend(predictions)
         
-        plt.tight_layout()
-        plt.savefig(folder+f"fold{k}-training-test-loss.pdf")
 
-        losses[f"fold#{k}"] = {"training_loss": training_loss, "validation_loss": test_loss}
+        # losses[f"fold#{k}"] = {"training_loss": training_loss, "validation_loss": test_loss}
 
+        # Atualizando arquivos de serialização
+        save_info(raw_fold_info, folder + "raw_fold_info.csv")
+        save_info(summarized_fold_info, folder + "summarized_fold_info.csv")
+        save_info(predictions, folder + "predictions.csv")
+        
         if(args.only_one_fold and k == 0):
             sys.exit()
 
-    plot_average_validation_loss(losses, args.epochs, 10, folder+"avg_validation_loss.pdf")
 
-    csv.close()
+        
 
-    plt.figure()
-    x = np.linspace(1, len(folds_losses), len(folds_losses))
-    plt.plot(x, folds_losses)
-    plt.savefig(folder+"folds-losses.pdf")
+    # plot_average_validation_loss(losses, args.epochs, 10, folder+"avg_validation_loss.pdf")
 
-    losses["folds-losses"] = folds_losses
+    # csv.close()
 
-    with open(folder+f"losses.bin", "wb+") as fp:
-        pk.dump(losses, fp)
+    # plt.figure()
+    # x = np.linspace(1, len(folds_losses), len(folds_losses))
+    # plt.plot(x, folds_losses)
+    # plt.savefig(folder+"folds-losses.pdf")
+
+    # losses["folds-losses"] = folds_losses
+
+    # with open(folder+f"losses.bin", "wb+") as fp:
+    #     pk.dump(losses, fp)
 
 
 
