@@ -49,4 +49,4 @@ def print_and_log(strings: Iterable, logfile = None) -> None:
 def save_info(info: Dict, file_name: str) -> None:
 
     info_df = pd.DataFrame.from_dict(info)
-    info_df.to_csv(file_name)
+    info_df.to_csv(file_name, index=False)

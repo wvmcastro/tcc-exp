@@ -96,17 +96,18 @@ def evaluate(model,
         predictions = []
         sum_loss = 0
         i = 0
+        
         for x, y in data:
             if cuda == True:
                 x, y = x.cuda(), y.cuda()
 
             pred = model(x)
-            l = loss(pred.view(-1), y)
+            pred = pred.view(-1)
+
+            l = loss(pred, y)
             
             sum_loss += l.item()
-            # TODO: alteração feita aqui, potencial pipoco
-            print(f"Teste de shape de predição: {pred.shape}")
-            predictions.extend(pred)
+            predictions.extend(pred.tolist())
             i += 1
     
     return predictions, sum_loss/i
