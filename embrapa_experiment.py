@@ -257,7 +257,8 @@ if __name__ == "__main__":
     # Informações de predição
     predictions_info = {
         "test_index": [],
-        "prediction": []
+        "prediction": [],
+        "real_value": []
     }
 
     for k in range(10):
@@ -273,11 +274,13 @@ if __name__ == "__main__":
 
         test_indexes = folds[k]
 
+        # Criação dos datasets de treino e validação
+        dstrain = EmbrapaP2Dataset(args.dataset_folder, train_indexes, augment=args.augment)
+        dstest = EmbrapaP2Dataset(args.dataset_folder, test_indexes)
+
         # Criação dos DataLoaders de treino e avaliação
-        dltrain = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, train_indexes, augment=args.augment), 
-                                                shuffle=True, batch_size=args.batch_size)
-        dltest = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, test_indexes), 
-                                                batch_size=args.batch_size)
+        dltrain = torch.utils.data.DataLoader(dstrain, shuffle=True, batch_size=args.batch_size)
+        dltest = torch.utils.data.DataLoader(dstest, batch_size=args.batch_size)
 
         model = get_model()
         
@@ -323,6 +326,12 @@ if __name__ == "__main__":
 
         predictions_info["test_index"].extend([index + 1 for index in test_indexes])
         predictions_info["prediction"].extend(predictions)
+        predictions_info["real_value"].extend([target for _, target in dstest])
+
+        print("preds: ", len(predictions_info["prediction"]))
+        print("real: ", len(predictions_info["real_value"]))
+        print([target for _, target in dstest])
+        print()
 
         # Atualizando arquivos de serialização
         save_info(raw_fold_info, folder + "raw_fold_info.csv")

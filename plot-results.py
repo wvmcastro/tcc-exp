@@ -11,6 +11,8 @@ from math import sqrt
 
 from my_utils import make_dir
 
+# TODO: abrir o arquivo csv com os valores reais (uma vez) e o csv com as predições. Dar um join baseado no test index para ter duas colunas: real predito.
+
 # Os números e nomes devem coincidir com a numeração do EXPERIMENT_NUMBER_BY_NAME do
 # group_prediction_csvs.py
 
