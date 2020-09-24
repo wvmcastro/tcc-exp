@@ -1,92 +1,71 @@
 import os
 from argparse import ArgumentParser
 import matplotlib.pyplot as plt
-import pickle as pk
+import pandas as pd
 import numpy as np
+import json
 
-# TODO: Adicionar cores para outras redes implementadas no futuro no futuro
+def get_avg_validation_loss(raw_fold_info_df: pd.DataFrame) -> pd.DataFrame:
+    
+    folds = len(raw_fold_info_df["fold"].unique())
 
-NUMBER_OF_FOLDS = 10
-EXPERIMENT_NUMBER_BY_NAME = {
-    'alexnet': 1,
-    'alexnet-augmented': 2,
-    'alexnet-super-augmented': 3,
-    'resnet18': 4,
-    'resnet18-augmented': 5,
-    'resnet18-super-augmented': 6,
-    'myalexnet-pretrained': 7,
-    'myalexnet-pretrained-augmented': 8,
-    'myalexnet-pretrained-super-augmented': 9,
-    'resnet18-pretrained': 10,
-    'resnet18-pretrained-augmented': 11,
-    'resnet18-pretrained-super-augmented': 12,
-    'vggnet11-pretrained-super-augmented': 13
-}
+    new_df = raw_fold_info_df[["epoch", "train_loss", "validation_loss"]].groupby("epoch").sum()
+    new_df["train_loss"] /= folds
+    new_df["validation_loss"] /= folds
 
-# https://sashamaps.net/docs/tools/20-colors/
-LINE_COLOR_BY_EXP = {
-    'alexnet': '#e6194B',
-    'alexnet-augmented': '#3cb44b',
-    'alexnet-super-augmented': '#ffe119',
-    'resnet18': '#4363d8',
-    'resnet18-augmented': '#f58231',
-    'resnet18-super-augmented': '#911eb4',
-    'myalexnet-pretrained': '#42d4f4',
-    'myalexnet-pretrained-augmented': '#f032e6',
-    'myalexnet-pretrained-super-augmented': '#bfef45',
-    'resnet18-pretrained': '#fabed4',
-    'resnet18-pretrained-augmented': '#469990',
-    'resnet18-pretrained-super-augmented': '#dcbeff',
-    'vggnet11-pretrained-super-augmented': '#9A6324'
-}
+    return new_df
+
+
+def get_all_experiments_avg_validation_loss(experiment_folder: str, show_model_names: bool = True) -> None:
+
+    experiments_df = pd.DataFrame(columns=["epoch", "train_loss", "validation_loss", "model"])
+
+    for experiment in os.listdir(experiment_folder):
+        for root, dirs, files in os.walk(experiment_folder+experiment):
+            for file_name in files:
+
+                if "raw_fold_info.csv" in file_name:
+
+                    raw_info_df = pd.read_csv(os.path.join(experiment_folder, experiment, file_name))
+                    experiment_avg_loss = get_avg_validation_loss(raw_info_df).reset_index()
+                    experiment_avg_loss["model"] = experiment
+
+                    experiments_df = experiments_df.append(experiment_avg_loss, ignore_index=True)
+
+                    break
+
+    models = experiments_df["model"].unique()
+    models.sort()
+    aliases = {name: f"#{i}" for i, name in enumerate(models, start=1)}
+
+    if not show_model_names:
+        experiments_df.replace(aliases, inplace=True)
+    
+    return experiments_df, aliases
+
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument("exp_dir", type=str, help="directory with all experiment directories")
+    parser.add_argument("--exp_dir", type=str, help="directory with all experiment directories")
+    parser.add_argument("--ommit_names", action="store_true", help="wheter ommit or not model names")
     parser.add_argument("--limited_epochs", type=int, help="specify number of epochs to be plotted, if not specified, plots all epochs.")
     args = parser.parse_args()
 
-    avg_val_losses_by_experiment = dict()
-    plt.figure()
-    plt.xlabel("Epochs")
-    plt.ylabel("Validation Loss")
+    experiments_df, aliases = get_all_experiments_avg_validation_loss(args.exp_dir, show_model_names=not args.ommit_names)
+    experiments_df = experiments_df[["epoch", "validation_loss", "model"]]
 
-    for root, dirs, files in os.walk(args.exp_dir):
-        for dir in dirs:
-            losses_file = f'{root}/{dir}/losses.bin'
-            experiment_name = dir
+    if args.limited_epochs is not None:
+        experiments_df = experiments_df[experiments_df["epoch"] < args.limited_epochs] # filtrando epoca
 
-            with open(losses_file, "rb") as fp:
-                losses_object = pk.load(fp)
-                
-                if args.limited_epochs is not None:
-                    epochs_start = 5
-                    number_of_epochs = args.limited_epochs
-                else:
-                    epochs_start = 5
-                    number_of_epochs = len(losses_object['fold#0']["validation_loss"])
-                
-                x = np.linspace(epochs_start, number_of_epochs, number_of_epochs - epochs_start)
-                avg_val_losses_by_experiment[experiment_name] = np.zeros(number_of_epochs - epochs_start)
-
-
-                for fold in range(NUMBER_OF_FOLDS):
-                    avg_val_losses_by_experiment[experiment_name] += np.array(losses_object[f'fold#{fold}']["validation_loss"][epochs_start:number_of_epochs])
-
-                avg_val_losses_by_experiment[experiment_name] /= NUMBER_OF_FOLDS
-
-                # if (EXPERIMENT_NUMBER_BY_NAME[experiment_name] > 6):
-                #     plt.plot(x, avg_val_losses_by_experiment[experiment_name], label=f'#{EXPERIMENT_NUMBER_BY_NAME[experiment_name]}', linestyle='dotted')
-                # else:
-
-                plt.plot(x, avg_val_losses_by_experiment[experiment_name], label=f'#{EXPERIMENT_NUMBER_BY_NAME[experiment_name]}', color=LINE_COLOR_BY_EXP[experiment_name])
-
-    # ordering labels in legend by experiment number
-    handles, labels = plt.gca().get_legend_handles_labels()
-    print('handles:', handles)
-    print('labels:', labels)
-    order = [labels.index('#1'), labels.index('#2'), labels.index('#3'), labels.index('#4'), labels.index('#5'), labels.index('#6'),
-     labels.index('#7'), labels.index('#8'), labels.index('#9'), labels.index('#10'), labels.index('#11'), labels.index('#12'), labels.index('#13')]
-    plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order])
+    experiments_df.set_index("epoch", inplace=True)
+    experiments_df = experiments_df.pivot(columns="model")
     
-    plt.savefig('all-experiments-avg-val-loss.pdf')
+    experiments_df["validation_loss"].plot()
+    plt.ylabel("Validation Loss")
+    plt.xlabel("Epochs")
+
+    # Saving plot and aliases in the experiment folder!
+    plt.savefig(args.exp_dir + 'all-experiments-avg-val-loss.pdf')
+
+    with open(args.exp_dir + "model_aliases.json", "w") as f:
+        json.dump(aliases, f, indent=2)
