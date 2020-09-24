@@ -309,8 +309,6 @@ if __name__ == "__main__":
         evaluation_end_time = time.time()
         print_and_log((f"Evaluation time: {evaluation_end_time - evaluation_start_time} seconds = {(evaluation_end_time - evaluation_start_time)/60} minutes", "\n"), mylogfile)
 
-        # folds_losses.append(loss)
-
         print_and_log((f"Test Loss: {loss}", "\n"), mylogfile)
 
         plot_fold_losses(training_loss, test_loss, k, folder)
@@ -327,11 +325,6 @@ if __name__ == "__main__":
         predictions_info["test_index"].extend([index + 1 for index in test_indexes])
         predictions_info["prediction"].extend(predictions)
         predictions_info["real_value"].extend([target for _, target in dstest])
-
-        print("preds: ", len(predictions_info["prediction"]))
-        print("real: ", len(predictions_info["real_value"]))
-        print([target for _, target in dstest])
-        print()
 
         # Atualizando arquivos de serialização
         save_info(raw_fold_info, folder + "raw_fold_info.csv")
