@@ -194,15 +194,3 @@ if __name__ == "__main__":
                             args.bins, w)
     scatter_plot_and_save(experiment_file, real, pred)
 
-    # metrics = dict()
-    # metrics[experiment_name] = get_metrics(real, pred)
-
-    # for key, values in metrics.items():
-    #     print(key)
-    #     print(values)
-    #     # print(f'{key.strip("experiment")} & {values["MAE"]} & {values["MSE"]} & {values["Pearson Correlation"]} & {values["MAPE"]}')
-    #     print("-"*15)
-    #     print()
-    
-    # plot_rroc_space(metrics, args.dst_dir)
-    
