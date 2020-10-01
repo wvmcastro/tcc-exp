@@ -2,11 +2,8 @@ import os
 from typing import Tuple
 from argparse import ArgumentParser
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches   
-import matplotlib.lines as mlines
+import matplotlib.patches as mpatches 
 import numpy as np
-from scipy.stats import pearsonr
-from math import sqrt
 import pandas as pd
 
 from my_utils import make_dir
@@ -25,6 +22,7 @@ def calc_intersections(hist1, hist2) -> float:
         s += min(p)
     
     return s
+
 
 def plot_and_save_histogram(experiment_name: str,
                             real: Tuple, 
@@ -92,92 +90,14 @@ def scatter_plot_and_save(experiment_name: str,
     plt.savefig(plot_name, bbox_inches="tight")
     plt.close()
 
-def mean_absolute_percentage_error(y_true, y_pred): 
-    y_true, y_pred = np.array(y_true), np.array(y_pred)
-    return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
-
-def get_metrics(real: Tuple, pred: Tuple) -> Tuple:
-    unders = []
-    overs = []
-    for p in zip(pred, real):
-        error = p[0] - p[1]
-        if error > 0:
-            overs.append(error)
-        else:
-            unders.append(error)
-    
-    n = len(real)
-
-    # TODO: Usar métricas do sklearn...
-    over = np.sum(overs)
-    under = np.sum(unders)
-    mean_error = (over + under) / n
-    mean_abs_error = (over - under) / n
-    mse = np.sum([e**2 for e in overs+unders])
-    rmse = sqrt(mse)
-    mape = mean_absolute_percentage_error(real, pred)
-    correlation = pearsonr(real, pred)[0]
-
-    metrics = {"over": over, "under": under, "mean_error": mean_error,
-               "MAE": mean_abs_error, "MSE": mse, "MAPE": mape, "RMSE": rmse, "Pearson Correlation": correlation}
-    
-    return metrics
-
-
-def plot_rroc_space(metrics: dict, dstdir):
-
-    # TODO: Refatorar essa belezinha para funcionar com um exemplo só
-
-    x = []
-    y = []
-    names = []
-    for e, m in metrics.items():
-        x.append(m["over"]/330)
-        y.append(m["under"]/330)
-        names.append(f"#{e.strip('experiment')}")
-    
-    l = max(np.max(x), abs(np.min(y)))
-
-    plt.figure()
-    plt.title("RROC SPACE")
-    # under + over = 0
-    dashes = [5, 5, 5, 5]
-    p = np.linspace(0, 1.8*l, 100)
-    plt.plot(p, -p, dashes=dashes, color="#cccccc")
-
-    colors = {"AlexNet": 'c', "ResNet18":'r', 'VGGNet11': 'g'}
-
-    plt.xlim((0, 1.1*l))
-    plt.ylim((-1.1*l, 0))
-    plt.xlabel("OVER")
-    plt.ylabel("UNDER")
-
-    # plotting point
-    for i, p in enumerate(zip(x,y)):
-        index = int(names[i].strip('#'))
-        model = experiment_model[index]
-        plt.plot(p[0], p[1], colors[model]+'x', label=names[i] + " " + model, markersize='12.0', markeredgewidth=2.0)
-    
-    # plotting name beside point
-    for i, name in enumerate(names):
-        model = experiment_model[int(name.strip("#"))]
-        plt.text(x[i]+4, y[i]+4, name, color='k', fontsize=9)
-
-    legend_elements = [mlines.Line2D([], [], color='c',  marker='x', linestyle='None', label='AlexNet',markersize='12.0', markeredgewidth=2.0),
-     mlines.Line2D([], [], color='r',  marker='x', linestyle='None', label='ResNet18', markersize='12.0', markeredgewidth=2.0),
-     mlines.Line2D([], [], color='g',  marker='x', linestyle='None', label='VGGNet11', markersize='12.0', markeredgewidth=2.0)]
-
-    plt.legend(handles=legend_elements)
-
-    plt.savefig(f"{dstdir}rroc.pdf")
-    plt.close()
-
 
 if __name__ == "__main__":
     parser = make_parse()
     args = parser.parse_args()
 
     make_dir(args.dst_dir)
+    
+    print(f"Loading from: {args.exp_dir}" + "predictions.csv")
 
     predictions_df = pd.read_csv(args.exp_dir + "predictions.csv")
 
