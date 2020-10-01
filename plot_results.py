@@ -192,5 +192,7 @@ if __name__ == "__main__":
     plot_and_save_histogram(experiment_file, 
                             real, pred, 
                             args.bins, w)
+
+    # Real x Prediction plot
     scatter_plot_and_save(experiment_file, real, pred)
 

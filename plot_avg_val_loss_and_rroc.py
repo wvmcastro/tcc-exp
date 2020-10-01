@@ -11,12 +11,12 @@ import matplotlib.lines as mlines
 
 # Atualizar conforme a necessidade
 COLOR_MAP = {
-    "AlexNet": 'c', 
+    "AlexNet": 'b', 
     "ResNet18":'r', 
     'VGGNet11': 'g',
-    "MaCNN": "r",
-    "ResNext50": "c",
-    "ResNext101": "g"
+    "MaCNN": "y",
+    "ResNext50": "k",
+    "ResNext101": "#eeefff"
 }
 
 
@@ -63,7 +63,9 @@ def plot_rroc_space(metrics: dict, dstdir: str, aliases: Dict[str, str]):
     for e, m in metrics.items():
         x.append(m["over"]/330)
         y.append(m["under"]/330)
-        names.append(f"#{e}")
+        model_alias = get_model_name_alias(e)
+        
+        names.append(f"#{model_alias}")
     
     l = max(np.max(x), abs(np.min(y)))
 
@@ -83,22 +85,18 @@ def plot_rroc_space(metrics: dict, dstdir: str, aliases: Dict[str, str]):
 
     print(names)
 
-
     # plotting point
     for i, p in enumerate(zip(x,y)):
-        # index = int(names[i].strip('#'))
-        # model = experiment_model[index]
-        print(names[i][1:], COLOR_MAP[names[i][1:]])
-        plt.plot(p[0], p[1], COLOR_MAP[names[i][1:]]+'x', label=names[i] , markersize='12.0', markeredgewidth=2.0)
+        plt.plot(p[0], p[1], COLOR_MAP[names[i].strip("#")]+'x', label=names[i] , markersize='12.0', markeredgewidth=2.0)
     
     # plotting name beside point
-    for i, name in enumerate(names):
+    for i, name in enumerate(metrics.keys()):
         # model = experiment_model[int(name.strip("#"))]
         # TODO: Refatorar para incluir os alias dos modelos !!!
-        plt.text(x[i]+4, y[i]+4, "", color='k', fontsize=9)
+        plt.text(x[i]+4, y[i]+4, aliases[name], color='k', fontsize=9)
 
     legend_elements = [
-        mlines.Line2D([], [], color=color,  marker='x', linestyle='None', label=model, markersize='12.0', markeredgewidth=2.0) for model, color in COLOR_MAP.items()
+        mlines.Line2D([], [], color=COLOR_MAP[model.strip("#")],  marker='x', linestyle='None', label=model.strip("#"), markersize='12.0', markeredgewidth=2.0) for model in names
     ]
 
     plt.legend(handles=legend_elements)
@@ -160,9 +158,9 @@ def plot_and_save_rroc_curve(experiment_folder: str, aliases: Dict[str, str]):
             for file_name in files:
 
                 if "predictions.csv" in file_name:
-                    # predictions_csv = pd.read_csv(os.path.join(experiment_folder, experiment, file_name))
+                    predictions_csv = pd.read_csv(os.path.join(experiment_folder, experiment, file_name))
                     # Gambito antes de teste
-                    predictions_csv = pd.read_csv("/home/kenzo/experiments/alexnet-pretrained-50ep/predictions.csv")
+                    # predictions_csv = pd.read_csv("/home/kenzo/experiments/alexnet-pretrained-50ep/predictions.csv")
 
                     # Sempre garantir que o nome das pastas dos experimentos contenham os nomes do COLOR_MAP
                     # experiment = get_model_name_alias(experiment)
