@@ -83,7 +83,6 @@ def plot_rroc_space(metrics: dict, dstdir: str, aliases: Dict[str, str]):
     plt.xlabel("OVER")
     plt.ylabel("UNDER")
 
-    print(names)
 
     # plotting point
     for i, p in enumerate(zip(x,y)):
@@ -95,6 +94,9 @@ def plot_rroc_space(metrics: dict, dstdir: str, aliases: Dict[str, str]):
         # TODO: Refatorar para incluir os alias dos modelos !!!
         plt.text(x[i]+4, y[i]+4, aliases[name], color='k', fontsize=9)
 
+    names = list(set(names))
+    print(names)
+    
     legend_elements = [
         mlines.Line2D([], [], color=COLOR_MAP[model.strip("#")],  marker='x', linestyle='None', label=model.strip("#"), markersize='12.0', markeredgewidth=2.0) for model in names
     ]
@@ -159,8 +161,6 @@ def plot_and_save_rroc_curve(experiment_folder: str, aliases: Dict[str, str]):
 
                 if "predictions.csv" in file_name:
                     predictions_csv = pd.read_csv(os.path.join(experiment_folder, experiment, file_name))
-                    # Gambito antes de teste
-                    # predictions_csv = pd.read_csv("/home/kenzo/experiments/alexnet-pretrained-50ep/predictions.csv")
 
                     # Sempre garantir que o nome das pastas dos experimentos contenham os nomes do COLOR_MAP
                     # experiment = get_model_name_alias(experiment)
