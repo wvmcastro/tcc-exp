@@ -55,8 +55,6 @@ def get_metrics(real: Tuple, pred: Tuple) -> Tuple:
 
 def plot_rroc_space(metrics: dict, dstdir: str, aliases: Dict[str, str]):
 
-    # TODO: Fazer o parsing do nome do modelo auqi dentro
-
     x = []
     y = []
     names = []
@@ -76,8 +74,6 @@ def plot_rroc_space(metrics: dict, dstdir: str, aliases: Dict[str, str]):
     p = np.linspace(0, 1.8*l, 100)
     plt.plot(p, -p, dashes=dashes, color="#cccccc")
 
-    # colors = {"AlexNet": 'c', "ResNet18":'r', 'VGGNet11': 'g'}
-
     plt.xlim((0, 1.1*l))
     plt.ylim((-1.1*l, 0))
     plt.xlabel("OVER")
@@ -90,12 +86,9 @@ def plot_rroc_space(metrics: dict, dstdir: str, aliases: Dict[str, str]):
     
     # plotting name beside point
     for i, name in enumerate(metrics.keys()):
-        # model = experiment_model[int(name.strip("#"))]
-        # TODO: Refatorar para incluir os alias dos modelos !!!
         plt.text(x[i]+4, y[i]+4, aliases[name], color='k', fontsize=9)
 
     names = list(set(names))
-    print(names)
     
     legend_elements = [
         mlines.Line2D([], [], color=COLOR_MAP[model.strip("#")],  marker='x', linestyle='None', label=model.strip("#"), markersize='12.0', markeredgewidth=2.0) for model in names
@@ -158,12 +151,9 @@ def plot_and_save_rroc_curve(experiment_folder: str, aliases: Dict[str, str]):
     for experiment in os.listdir(experiment_folder):
         for root, dirs, files in os.walk(experiment_folder+experiment):
             for file_name in files:
-
                 if "predictions.csv" in file_name:
-                    predictions_csv = pd.read_csv(os.path.join(experiment_folder, experiment, file_name))
 
-                    # Sempre garantir que o nome das pastas dos experimentos contenham os nomes do COLOR_MAP
-                    # experiment = get_model_name_alias(experiment)
+                    predictions_csv = pd.read_csv(os.path.join(experiment_folder, experiment, file_name))
                     metrics[experiment] = get_metrics(predictions_csv["real_value"].values, predictions_csv["prediction"].values)
     
                     break

@@ -236,8 +236,6 @@ if __name__ == "__main__":
 
     n = len(EmbrapaP2Dataset(args.dataset_folder))
 
-    # csv = open(folder+"predictions.csv", "w+")
-
     folds = get_folds(n, 10)
 
     # Registro de informações de cada fold
@@ -307,6 +305,7 @@ if __name__ == "__main__":
         evaluation_start_time = time.time()
         predictions, loss = evaluate(model, dltest, nn.MSELoss())
         evaluation_end_time = time.time()
+        
         print_and_log((f"Evaluation time: {evaluation_end_time - evaluation_start_time} seconds = {(evaluation_end_time - evaluation_start_time)/60} minutes", "\n"), mylogfile)
 
         print_and_log((f"Test Loss: {loss}", "\n"), mylogfile)
