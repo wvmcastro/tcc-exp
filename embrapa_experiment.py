@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from typing import List
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle as pk
@@ -12,7 +13,7 @@ from torchvision.models import resnext50_32x4d, resnext101_32x8d
 import torch
 import torch.nn as nn
 
-from my_utils import get_folds, print_and_log, make_dir
+from my_utils import get_folds, print_and_log, make_dir, save_info
 from my_utils_regression import train, evaluate
 
 from Alexnet import AlexNet
@@ -152,6 +153,7 @@ def save_predictions(indexes, predictions_list, csvfile) -> None:
     for predictions in predictions_list:
         pred = [p.item() for p in predictions]
         for index, pred in zip(indexes, predictions):
+            # TODO: Esse +1 deve servir para algo!!!!!!
             csvfile.write(f"{index+1}, {pred.item()}\n")
 
 def create_checkpoints_list(epochs_between_checkpoints, epochs):
@@ -162,20 +164,19 @@ def create_checkpoints_list(epochs_between_checkpoints, epochs):
         epochs_executed += epochs_between_checkpoints
     return checkpoints_list
 
-def plot_average_validation_loss(losses, number_of_epochs, number_of_folds, filename):
-    x = np.linspace(1, number_of_epochs, number_of_epochs)
+def plot_fold_losses(train_losses: List[float], validation_losses: List[float], fold: int, folder: str) -> None:
 
-    average_validation_loss = np.zeros(number_of_epochs)
-    for fold in range(number_of_folds):
-        average_validation_loss += np.array(losses[f'fold#{fold}']["validation_loss"])
+    x = np.linspace(1, len(train_losses), len(train_losses))
+    fig, axs = plt.subplots(2)
+    
+    axs[0].set_title("Training Loss")
+    axs[0].plot(x, train_losses, c='c')
 
-    average_validation_loss /= number_of_folds
-
-    plt.figure()
-    plt.plot(x, average_validation_loss)
-    plt.xlabel("Epochs")
-    plt.ylabel("Validation Loss")
-    plt.savefig(filename)
+    axs[1].set_title("Validation Loss")
+    axs[1].plot(x, validation_losses, c='m')
+    
+    plt.tight_layout()
+    plt.savefig(folder+f"fold{fold}-training-test-loss.pdf")
 
 if __name__ == "__main__":    
     parser = ArgumentParser()
@@ -235,26 +236,49 @@ if __name__ == "__main__":
 
     n = len(EmbrapaP2Dataset(args.dataset_folder))
 
-    csv = open(folder+"predictions.csv", "w+")
-
     folds = get_folds(n, 10)
-    folds_losses = []
-    losses = dict()
+
+    # Registro de informações de cada fold
+    raw_fold_info = {
+        "fold": [],
+        "epoch": [],
+        "train_loss": [],
+        "validation_loss": []
+    }
+
+    # Informações sumarizadas de cada fold
+    summarized_fold_info = {
+        "fold": [],
+        "loss": []
+    }
+
+    # Informações de predição
+    predictions_info = {
+        "test_index": [],
+        "prediction": [],
+        "real_value": []
+    }
+
     for k in range(10):
+
         mylogfile = folder + f"fold{k}.log"
         print_and_log((f"Fold #{k}",), mylogfile)
 
-
+        # Preparação dos folds
         train_indexes = []
         for n in range(10):
             if n != k:
                 train_indexes += folds[n]
+
         test_indexes = folds[k]
 
-        dltrain = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, train_indexes, augment=args.augment), 
-                                                shuffle=True, batch_size=args.batch_size)
-        dltest = torch.utils.data.DataLoader(EmbrapaP2Dataset(args.dataset_folder, test_indexes), 
-                                                batch_size=args.batch_size)
+        # Criação dos datasets de treino e validação
+        dstrain = EmbrapaP2Dataset(args.dataset_folder, train_indexes, augment=args.augment)
+        dstest = EmbrapaP2Dataset(args.dataset_folder, test_indexes)
+
+        # Criação dos DataLoaders de treino e avaliação
+        dltrain = torch.utils.data.DataLoader(dstrain, shuffle=True, batch_size=args.batch_size)
+        dltest = torch.utils.data.DataLoader(dstest, batch_size=args.batch_size)
 
         model = get_model()
         
@@ -267,6 +291,7 @@ if __name__ == "__main__":
 
         training_start_time = time.time()
 
+        # Treinamento em K-1 folds e avaliação no K-ésimo
         training_loss, test_loss = train(model, opt,  nn.MSELoss(), dltrain, dltest, 
                                          args.epochs, lr_schedular=None,
                                          cuda=True, logfile=mylogfile,
@@ -280,44 +305,33 @@ if __name__ == "__main__":
         evaluation_start_time = time.time()
         predictions, loss = evaluate(model, dltest, nn.MSELoss())
         evaluation_end_time = time.time()
+        
         print_and_log((f"Evaluation time: {evaluation_end_time - evaluation_start_time} seconds = {(evaluation_end_time - evaluation_start_time)/60} minutes", "\n"), mylogfile)
-
-        folds_losses.append(loss)
 
         print_and_log((f"Test Loss: {loss}", "\n"), mylogfile)
 
-        save_predictions(test_indexes, predictions, csv)
-        
-        x = np.linspace(1, len(training_loss), len(training_loss))
-        fig, axs = plt.subplots(2)
-        
-        axs[0].set_title("Training Loss")
-        axs[0].plot(x, training_loss, c='c')
+        plot_fold_losses(training_loss, test_loss, k, folder)
 
-        axs[1].set_title("Validation Loss")
-        axs[1].plot(x, test_loss, c='m')
+        # Atualizando informações a serializar
+        raw_fold_info["fold"].extend([k]*len(training_loss))
+        raw_fold_info["epoch"].extend(list(range(len(training_loss))))
+        raw_fold_info["train_loss"].extend(training_loss)
+        raw_fold_info["validation_loss"].extend(test_loss)
+
+        summarized_fold_info["fold"].append(k)
+        summarized_fold_info["loss"].append(loss)
+
+        predictions_info["test_index"].extend([index + 1 for index in test_indexes])
+        predictions_info["prediction"].extend(predictions)
+        predictions_info["real_value"].extend([target for _, target in dstest])
+
+        # Atualizando arquivos de serialização
+        save_info(raw_fold_info, folder + "raw_fold_info.csv")
+        save_info(summarized_fold_info, folder + "summarized_fold_info.csv")
+        save_info(predictions_info, folder + "predictions.csv")
         
-        plt.tight_layout()
-        plt.savefig(folder+f"fold{k}-training-test-loss.pdf")
-
-        losses[f"fold#{k}"] = {"training_loss": training_loss, "validation_loss": test_loss}
-
         if(args.only_one_fold and k == 0):
             sys.exit()
-
-    plot_average_validation_loss(losses, args.epochs, 10, folder+"avg_validation_loss.pdf")
-
-    csv.close()
-
-    plt.figure()
-    x = np.linspace(1, len(folds_losses), len(folds_losses))
-    plt.plot(x, folds_losses)
-    plt.savefig(folder+"folds-losses.pdf")
-
-    losses["folds-losses"] = folds_losses
-
-    with open(folder+f"losses.bin", "wb+") as fp:
-        pk.dump(losses, fp)
 
 
 

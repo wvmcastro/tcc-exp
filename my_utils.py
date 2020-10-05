@@ -1,6 +1,7 @@
-from typing import Tuple, List, Iterable
+from typing import Tuple, List, Iterable, Dict
 import os
 from random import shuffle
+import pandas as pd
 
 from torch.utils import data
 
@@ -44,3 +45,8 @@ def print_and_log(strings: Iterable, logfile = None) -> None:
     else:
         for s in strings:
             print(s)
+
+def save_info(info: Dict, file_name: str) -> None:
+
+    info_df = pd.DataFrame.from_dict(info)
+    info_df.to_csv(file_name, index=False)
