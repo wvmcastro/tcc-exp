@@ -3,6 +3,8 @@ import torch
 import numpy as np
 from my_utils import print_and_log
 from BaseCNN import BaseConvNet
+from math import sqrt
+from scipy.stats import pearsonr
 
 def get_next_chkpt(checkpoints_list: List[int]) -> int:
     for chkpt in checkpoints_list:
@@ -111,3 +113,36 @@ def evaluate(model,
             i += 1
     
     return predictions, sum_loss/i
+
+
+def mean_absolute_percentage_error(y_true, y_pred): 
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+
+
+def get_metrics(real: Tuple, pred: Tuple) -> Tuple:
+    unders = []
+    overs = []
+    for p in zip(pred, real):
+        error = p[0] - p[1]
+        if error > 0:
+            overs.append(error)
+        else:
+            unders.append(error)
+    
+    n = len(real)
+
+    # TODO: Usar métricas do sklearn...
+    over = np.sum(overs)
+    under = np.sum(unders)
+    mean_error = (over + under) / n
+    mean_abs_error = (over - under) / n
+    mse = np.sum([e**2 for e in overs+unders])
+    rmse = sqrt(mse)
+    mape = mean_absolute_percentage_error(real, pred)
+    correlation = pearsonr(real, pred)[0]
+
+    metrics = {"over": over, "under": under, "mean_error": mean_error,
+               "MAE": mean_abs_error, "MSE": mse, "MAPE": mape, "RMSE": rmse, "Pearson Correlation": correlation}
+    
+    return metrics

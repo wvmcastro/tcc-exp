@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 
 from my_utils import make_dir
+from my_utils_regression import get_metrics
 
 def make_parse() -> ArgumentParser:
     parser = ArgumentParser()
@@ -105,6 +106,8 @@ if __name__ == "__main__":
     experiment_file = args.dst_dir + "/" + experiment_name
 
     real, pred = predictions_df["real_value"].values, predictions_df["prediction"].values
+
+    print(get_metrics(predictions_df["real_value"].values, predictions_df["prediction"].values))
     
     w = np.ones(len(real)) / len(real)
 
