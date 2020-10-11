@@ -1,4 +1,4 @@
-from typing import List, Iterable, Tuple
+from typing import List, Iterable, Tuple, Dict
 import torch
 import numpy as np
 from my_utils import print_and_log
@@ -120,7 +120,7 @@ def mean_absolute_percentage_error(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
 
-def get_metrics(real: Tuple, pred: Tuple) -> Tuple:
+def get_metrics(real: Tuple, pred: Tuple) -> Dict[str, float]:
     unders = []
     overs = []
     for p in zip(pred, real):

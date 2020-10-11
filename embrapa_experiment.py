@@ -14,7 +14,7 @@ import torch
 import torch.nn as nn
 
 from my_utils import get_folds, print_and_log, make_dir, save_info
-from my_utils_regression import train, evaluate
+from my_utils_regression import train, evaluate, get_metrics
 
 from Alexnet import AlexNet
 from resnets import ResNet18
@@ -246,10 +246,18 @@ if __name__ == "__main__":
         "validation_loss": []
     }
 
-    # Informações sumarizadas de cada fold
-    summarized_fold_info = {
+    # Métricas de cada fold
+    fold_metrics_info = {
         "fold": [],
-        "loss": []
+        "loss": [],
+        "over": [],
+        "under": [],
+        "mean_error": [],
+        "MAE": [],
+        "MSE": [],
+        "MAPE": [],
+        "RMSE": [],
+        "Pearson Correlation": []
     }
 
     # Informações de predição
@@ -304,6 +312,7 @@ if __name__ == "__main__":
 
         evaluation_start_time = time.time()
         predictions, loss = evaluate(model, dltest, nn.MSELoss())
+        real_values = [target for _, target in dstest]
         evaluation_end_time = time.time()
         
         print_and_log((f"Evaluation time: {evaluation_end_time - evaluation_start_time} seconds = {(evaluation_end_time - evaluation_start_time)/60} minutes", "\n"), mylogfile)
@@ -318,16 +327,19 @@ if __name__ == "__main__":
         raw_fold_info["train_loss"].extend(training_loss)
         raw_fold_info["validation_loss"].extend(test_loss)
 
-        summarized_fold_info["fold"].append(k)
-        summarized_fold_info["loss"].append(loss)
-
+        metrics = get_metrics(real_values, predictions)
+        fold_metrics_info["fold"].append(k)
+        fold_metrics_info["loss"].append(loss)
+        for metric_name, value in metrics.items():
+            fold_metrics_info[metric_name].append(value)
+        
         predictions_info["test_index"].extend([index + 1 for index in test_indexes])
         predictions_info["prediction"].extend(predictions)
-        predictions_info["real_value"].extend([target for _, target in dstest])
+        predictions_info["real_value"].extend(real_values)
 
         # Atualizando arquivos de serialização
         save_info(raw_fold_info, folder + "raw_fold_info.csv")
-        save_info(summarized_fold_info, folder + "summarized_fold_info.csv")
+        save_info(fold_metrics_info, folder + "fold_metrics.csv")
         save_info(predictions_info, folder + "predictions.csv")
         
         if(args.only_one_fold and k == 0):
