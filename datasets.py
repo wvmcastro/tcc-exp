@@ -157,3 +157,23 @@ class EmbrapaP2Dataset(data.Dataset):
         return x, np.float32(y)
 
     # Cyclical learning hate com SGD
+
+class InferenceDataset(data.Dataset):
+
+    def __init__(self,
+                 source_dir: str,
+                 transforms: transforms.Compose):
+
+        self.images = [os.path.join(source_dir, image) for image in os.listdir(source_dir)]
+        self.transform = transforms
+
+    def __len__(self) -> int:
+
+        return len(self.images)
+
+    def __getitem__(self, i) -> torch.Tensor:
+
+        image_path = self.images[i]
+        image = Image.open(image_path)
+
+        return self.transform(image)
