@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from typing import List
+from typing import Callable, List
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle as pk
@@ -178,6 +178,44 @@ def plot_fold_losses(train_losses: List[float], validation_losses: List[float], 
     plt.tight_layout()
     plt.savefig(folder+f"fold{fold}-training-test-loss.pdf")
 
+def get_model_factory(model_name: str) -> Callable[[None], nn.Module]:
+
+    get_model = None
+
+    if model_name == "alexnet":
+        get_model = get_alexNet
+    if model_name == "imagenetalexnet":
+        get_model = get_alexNet
+    elif model_name == "resnet":
+        get_model = get_resnet18
+    elif model_name == "myresnet":
+        get_model = get_my_resnet
+    elif model_name == "mobilenet":
+        get_model = get_mobilenetv2
+    elif model_name == "myalexnetpretrained":
+        get_model = get_myalexnet_pretrained
+    elif model_name == "resnet18pretrained":
+        get_model = get_resnet18_pretrained
+    elif model_name == "vggnet11":
+        get_model = get_vggnet11
+    elif model_name == "vggnet11pretrained":
+        get_model = get_vggnet11_pretrained
+    elif model_name == "MaCNN":
+        get_model = get_MaCNN
+    elif model_name == "lfcnn":
+        get_model = get_lfCnn
+    elif model_name == "resnext50":
+        get_model = get_resnext50
+    elif model_name == "resnext101":
+        get_model = get_resnext101
+    elif model_name == "resnext50pretrained":
+        get_model = get_resnext50_pretrained
+    elif model_name == "resnext101pretrained":
+        get_model = get_resnext101_pretrained
+
+    return get_model
+
+
 if __name__ == "__main__":    
     parser = ArgumentParser()
     parser.add_argument("model", type=str, 
@@ -198,37 +236,7 @@ if __name__ == "__main__":
     device = torch.device(f'cuda:{args.cuda_device_number}') if torch.cuda.is_available() else torch.device('cpu')
     torch.cuda.set_device(device)
 
-    get_model = None
-    if args.model == "alexnet":
-        get_model = get_alexNet
-    if args.model == "imagenetalexnet":
-        get_model = get_alexNet
-    elif args.model == "resnet":
-        get_model = get_resnet18
-    elif args.model == "myresnet":
-        get_model = get_my_resnet
-    elif args.model == "mobilenet":
-        get_model = get_mobilenetv2
-    elif args.model == "myalexnetpretrained":
-        get_model = get_myalexnet_pretrained
-    elif args.model == "resnet18pretrained":
-        get_model = get_resnet18_pretrained
-    elif args.model == "vggnet11":
-        get_model = get_vggnet11
-    elif args.model == "vggnet11pretrained":
-        get_model = get_vggnet11_pretrained
-    elif args.model == "MaCNN":
-        get_model = get_MaCNN
-    elif args.model == "lfcnn":
-        get_model = get_lfCnn
-    elif args.model == "resnext50":
-        get_model = get_resnext50
-    elif args.model == "resnext101":
-        get_model = get_resnext101
-    elif args.model == "resnext50pretrained":
-        get_model = get_resnext50_pretrained
-    elif args.model == "resnext101pretrained":
-        get_model = get_resnext101_pretrained
+    get_model = get_model_factory(args.model)
     
     folder = args.experiment_folder
 

@@ -49,37 +49,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    get_model = None
-    if args.model == "alexnet":
-        get_model = get_alexNet
-    if args.model == "imagenetalexnet":
-        get_model = get_alexNet
-    elif args.model == "resnet":
-        get_model = get_resnet18
-    elif args.model == "myresnet":
-        get_model = get_my_resnet
-    elif args.model == "mobilenet":
-        get_model = get_mobilenetv2
-    elif args.model == "myalexnetpretrained":
-        get_model = get_myalexnet_pretrained
-    elif args.model == "resnet18pretrained":
-        get_model = get_resnet18_pretrained
-    elif args.model == "vggnet11":
-        get_model = get_vggnet11
-    elif args.model == "vggnet11pretrained":
-        get_model = get_vggnet11_pretrained
-    elif args.model == "MaCNN":
-        get_model = get_MaCNN
-    elif args.model == "lfcnn":
-        get_model = get_lfCnn
-    elif args.model == "resnext50":
-        get_model = get_resnext50
-    elif args.model == "resnext101":
-        get_model = get_resnext101
-    elif args.model == "resnext50pretrained":
-        get_model = get_resnext50_pretrained
-    elif args.model == "resnext101pretrained":
-        get_model = get_resnext101_pretrained
+    get_model = get_model_factory(args.model)
 
     model = get_model()
     device = torch.device(f'cuda:{args.cuda_device_number}') if torch.cuda.is_available() else torch.device('cpu')
