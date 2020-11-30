@@ -164,7 +164,7 @@ class InferenceDataset(data.Dataset):
                  source_dir: str,
                  transforms: transforms.Compose):
 
-        self.images = [os.path.join(source_dir, image) for image in os.listdir(source_dir)]
+        self.images = [os.path.join(source_dir, image) for image in os.listdir(source_dir) if os.path.isfile(os.path.join(source_dir, image))]
         self.transform = transforms
 
     def __len__(self) -> int:
