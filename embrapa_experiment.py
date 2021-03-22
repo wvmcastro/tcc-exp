@@ -22,6 +22,23 @@ from Mobilenet import MobileNetV2
 from datasets import EmbrapaP2Dataset
 from MaCNN import MaCNN, LfCNN
 
+def make_parser() -> ArgumentParser:
+    parser = ArgumentParser()
+    parser.add_argument("model", type=str, 
+                        help="supported models: alexnet, resnet18 or vggnet11")
+    parser.add_argument("dataset_folder", type=str)
+    parser.add_argument("--experiment_folder", type=str, default="")
+    parser.add_argument("--epochs", type=int, default=1)
+    parser.add_argument("--batch_size", type=int, default=128)
+    parser.add_argument("--lr", type=float, default=0.001)
+    parser.add_argument("--augment", type=str, default="no", help="options: no, yes, super")
+    parser.add_argument("--epochs_between_checkpoints", type=int, default=100)
+    parser.add_argument("--cuda_device_number", type=int, default=0)
+    parser.add_argument('--only_one_fold', dest='only_one_fold', action='store_true')
+    parser.set_defaults(only_one_fold=False)
+    
+    return parser
+
 def get_MaCNN():
     net = MaCNN(1)
     net.name = "MaCNN"
@@ -178,21 +195,8 @@ def plot_fold_losses(train_losses: List[float], validation_losses: List[float], 
     plt.tight_layout()
     plt.savefig(folder+f"fold{fold}-training-test-loss.pdf")
 
-if __name__ == "__main__":    
-    parser = ArgumentParser()
-    parser.add_argument("model", type=str, 
-                        help="supported models: alexnet, resnet18 or vggnet11")
-    parser.add_argument("dataset_folder", type=str)
-    parser.add_argument("--experiment_folder", type=str, default="")
-    parser.add_argument("--epochs", type=int, default=1)
-    parser.add_argument("--batch_size", type=int, default=128)
-    parser.add_argument("--lr", type=float, default=0.001)
-    parser.add_argument("--augment", type=str, default="no", help="options: no, yes, super")
-    parser.add_argument("--epochs_between_checkpoints", type=int, default=100)
-    parser.add_argument("--cuda_device_number", type=int, default=0)
-    parser.add_argument('--only_one_fold', dest='only_one_fold', action='store_true')
-    parser.set_defaults(only_one_fold=False)
-
+if __name__ == "__main__":
+    parser = make_parser()
     args = parser.parse_args()
 
     device = torch.device(f'cuda:{args.cuda_device_number}') if torch.cuda.is_available() else torch.device('cpu')
@@ -344,6 +348,3 @@ if __name__ == "__main__":
         
         if(args.only_one_fold and k == 0):
             sys.exit()
-
-
-
