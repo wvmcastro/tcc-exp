@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from datasets import DeepPhenoDataset
-from Alexnet import AlexNet
+from models import AlexNet
 from my_utils import train, test
 
 if __name__ == "__main__":

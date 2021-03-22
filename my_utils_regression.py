@@ -2,7 +2,7 @@ from typing import List, Iterable, Tuple, Dict
 import torch
 import numpy as np
 from my_utils import print_and_log
-from BaseCNN import BaseConvNet
+from models import BaseConvNet
 from math import sqrt
 from scipy.stats import pearsonr
 

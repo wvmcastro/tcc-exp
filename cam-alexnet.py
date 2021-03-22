@@ -10,7 +10,7 @@ import cv2
 
 from embrapa_experiment import get_alexNet
 from embrapa_experiment import get_myalexnet_pretrained
-from BaseCNN import BaseConvNet
+from models import BaseConvNet
 
 class CamAlexNet(nn.Module):
     def __init__(self, pretrained_model: BaseConvNet):
