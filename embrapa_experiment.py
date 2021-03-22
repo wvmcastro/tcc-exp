@@ -16,11 +16,9 @@ import torch.nn as nn
 from my_utils import get_folds, print_and_log, make_dir, save_info
 from my_utils_regression import train, evaluate, get_metrics
 
-from Alexnet import AlexNet
-from resnets import ResNet18
-from Mobilenet import MobileNetV2
+from models import AlexNet, ResNet18, MobileNetV2, MaCNN, LfCNN
+
 from datasets import EmbrapaP2Dataset
-from MaCNN import MaCNN, LfCNN
 
 def make_parser() -> ArgumentParser:
     parser = ArgumentParser()
@@ -49,7 +47,7 @@ def get_lfCnn():
     net.name = "lfcnn"
     return net
 
-def get_imagent_alexNet():
+def get_imagenet_alexNet():
     net = alexnet(pretrained=True)
     
     regressor = nn.Sequential(
@@ -81,7 +79,7 @@ def get_alexNet():
 
 def get_myalexnet_pretrained():
     net = get_alexNet()
-    imagenet_alexnet = get_imagent_alexNet()
+    imagenet_alexnet = get_imagenet_alexNet()
     net._features = imagenet_alexnet.features
     net.name = "MyAlexNetPretrained"
 
@@ -206,7 +204,7 @@ if __name__ == "__main__":
     if args.model == "alexnet":
         get_model = get_alexNet
     if args.model == "imagenetalexnet":
-        get_model = get_alexNet
+        get_model = get_imagenet_alexNet
     elif args.model == "resnet":
         get_model = get_resnet18
     elif args.model == "myresnet":

@@ -1,4 +1,0 @@
-python embrapa_experiment.py alexnet ../GSD05/2019-01-23/ --experiment_folder ../experiments/alexnet-augmented/ --epochs 400 --batch_size 256 --augment yes --epochs_between_checkpoints 100 --cuda_device_number 2 \
-&& python embrapa_experiment.py resnet ../GSD05/2019-01-23/ --experiment_folder ../experiments/resnet18-augmented/ --epochs 500 --batch_size 128 --augment yes --epochs_between_checkpoints 100 --cuda_device_number 2 \
-&& python embrapa_experiment.py myalexnetpretrained ../GSD05/2019-01-23/ --experiment_folder ../experiments/myalexnet-pretrained-augmented/ --epochs 200 --batch_size 256 --augment yes --epochs_between_checkpoints 100 --cuda_device_number 2 \
-&& python embrapa_experiment.py resnet18pretrained ../GSD05/2019-01-23/ --experiment_folder ../experiments/resnet18-pretrained-augmented/ --epochs 200 --batch_size 128 --augment yes --epochs_between_checkpoints 100 --cuda_device_number 2

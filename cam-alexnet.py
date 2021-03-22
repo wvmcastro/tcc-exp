@@ -87,8 +87,6 @@ def draw_heatmap(model: BaseConvNet, imgpath) -> np.ndarray:
 
     return heated_img
 
-
-
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("pth_file", type=str, help="pth file with the\
