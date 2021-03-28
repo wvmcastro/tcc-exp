@@ -16,7 +16,7 @@ import torch.nn as nn
 from my_utils import get_folds, print_and_log, make_dir, save_info
 from my_utils_regression import train, evaluate, get_metrics
 
-from models import AlexNet, ResNet18, MobileNetV2, MaCNN, LfCNN, Darknet53
+from models import AlexNet, ResNet18, MobileNetV2, MaCNN, LfCNN, darknet53
 
 from datasets import EmbrapaP2Dataset
 
@@ -38,7 +38,7 @@ def make_parser() -> ArgumentParser:
     return parser
 
 def get_darknet53():
-    net = Darknet53(1)
+    net = darknet53(1)
     net.name = "DarkNet53"
     return net
 
@@ -238,7 +238,7 @@ if __name__ == "__main__":
         get_model = get_resnext101_pretrained
     elif args.model == "darknet53":
         get_model = get_darknet53
-        
+
     folder = args.experiment_folder
 
     make_dir(folder)
