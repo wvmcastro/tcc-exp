@@ -10,7 +10,7 @@ import cv2
 
 from embrapa_experiment import get_alexNet
 from embrapa_experiment import get_myalexnet_pretrained
-from BaseCNN import BaseConvNet
+from models import BaseConvNet
 
 class CamAlexNet(nn.Module):
     def __init__(self, pretrained_model: BaseConvNet):
@@ -86,8 +86,6 @@ def draw_heatmap(model: BaseConvNet, imgpath) -> np.ndarray:
     heated_img = img + 0.3 * heatmap
 
     return heated_img
-
-
 
 if __name__ == "__main__":
     parser = ArgumentParser()
