@@ -6,8 +6,8 @@ import matplotlib.patches as mpatches
 import numpy as np
 import pandas as pd
 
-from my_utils import make_dir
-from my_utils_regression import get_metrics
+from ..my_utils import make_dir
+from ..my_utils_regression import get_metrics
 
 def make_parse() -> ArgumentParser:
     parser = ArgumentParser()
