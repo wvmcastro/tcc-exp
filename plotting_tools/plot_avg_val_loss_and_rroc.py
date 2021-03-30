@@ -1,12 +1,16 @@
+import sys
+sys.path.append("..")
+
 import os
-from argparse import ArgumentParser
-from typing import Tuple, Dict
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import json
 import matplotlib.lines as mlines
-from ..my_utils_regression import get_metrics
+
+from argparse import ArgumentParser
+from typing import Tuple, Dict
+from my_utils_regression import get_metrics
 
 # Atualizar conforme a necessidade
 COLOR_MAP = {
