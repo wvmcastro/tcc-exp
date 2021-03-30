@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import json
 import matplotlib.lines as mlines
-from ..my_utils_regression import get_metrics
+from my_utils_regression import get_metrics
 
 # Atualizar conforme a necessidade
 COLOR_MAP = {
