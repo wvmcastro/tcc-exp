@@ -10,6 +10,7 @@ import matplotlib.lines as mlines
 
 from argparse import ArgumentParser
 from typing import Tuple, Dict
+
 from my_utils_regression import get_metrics
 
 # Atualizar conforme a necessidade
