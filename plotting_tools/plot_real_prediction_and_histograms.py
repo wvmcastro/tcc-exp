@@ -1,11 +1,14 @@
+import sys
+sys.path.append('..')
+
 import os
-from typing import Tuple
-from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches 
 import numpy as np
 import pandas as pd
 
+from typing import Tuple
+from argparse import ArgumentParser
 from my_utils import make_dir
 from my_utils_regression import get_metrics
 
